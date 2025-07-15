@@ -64,49 +64,52 @@
     <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
   </div>
 
-  <script>
-    const nip = localStorage.getItem('nip');
-    const nama = localStorage.getItem('nama') || 'Tim SDS Snack';
+<script>
+  // isi otomatis
+  window.onload = () => {
+    document.getElementById('nip').value = localStorage.getItem('nip') || '';
+    document.getElementById('nama').value = localStorage.getItem('nama') || '';
+    
+    const now = new Date();
+    document.getElementById('tanggal').value = now.toLocaleDateString('id-ID');
+    document.getElementById('jam').value = now.toLocaleTimeString('id-ID');
 
-    if (!nip) {
-      alert("Anda belum login.");
-      window.location.href = "index.html";
-    }
-
-    document.getElementById('nip').value = nip;
-    document.getElementById('nama').value = nama;
-    document.getElementById('tanggal').value = new Date().toLocaleDateString('id-ID');
-    document.getElementById('jam').value = new Date().toLocaleTimeString('id-ID');
-
-    // Ambil Lokasi
+    // ambil lokasi
     navigator.geolocation.getCurrentPosition(pos => {
       const { latitude, longitude } = pos.coords;
-      document.getElementById('lokasi').value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
-    }, () => {
-      alert("Tidak bisa ambil lokasi.");
+      document.getElementById('lokasi').value = `${latitude}, ${longitude}`;
+    }, err => {
+      console.warn("Lokasi gagal didapat:", err.message);
+      document.getElementById('lokasi').value = "Tidak tersedia";
     });
+  }
 
-    // Kirim absen ke Apps Script
-    function kirimAbsen() {
-      const data = {
-        nip: document.getElementById('nip').value,
-        nama: document.getElementById('nama').value,
-        tanggal: document.getElementById('tanggal').value,
-        jam: document.getElementById('jam').value,
-        lokasi: document.getElementById('lokasi').value,
-        fotoBase64: "" // dikosongkan karena tidak pakai selfie
-      };
+  function kirimAbsen() {
+    const data = {
+      nip: document.getElementById('nip').value,
+      nama: document.getElementById('nama').value,
+      tanggal: document.getElementById('tanggal').value,
+      jam: document.getElementById('jam').value,
+      lokasi: document.getElementById('lokasi').value
+    };
 
-      google.script.run.withSuccessHandler(() => {
-        alert("Absensi berhasil disimpan!");
-        window.location.href = "home.html";
-      }).simpanAbsen(data);
-    }
+    // kirim data ke Apps Script
+    fetch("https://script.google.com/macros/s/AKfycbzsV1azAclTItvmQOQZxS340l8Yy5iYcAXjmPWfTHBQ3XBfJzFldeqtuNDAHkAq8_6l/exec", {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
+    })
+    .then(res => res.text())
+    .then(res => {
+      alert("Absensi berhasil dikirim!");
+      window.location.href = "home.html";
+    })
+    .catch(err => {
+      console.error("Gagal kirim absensi", err);
+      alert("Gagal kirim absensi.");
+    });
+  }
+</script>
 
-    // PWA Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
 </body>
 </html>
