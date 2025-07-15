@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Form Absen - Tim SDS Snack</title>
-  <link rel="manifest" href="manifest.json" />
+ 
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -23,7 +23,7 @@
       text-align: center;
       margin-bottom: 1rem;
     }
-    input, button {
+    input, select, button {
       width: 100%;
       padding: 0.8rem;
       margin-bottom: 1rem;
@@ -58,6 +58,12 @@
     <label>Jam</label>
     <input type="text" id="jam" readonly />
 
+    <label>Jenis Absen</label>
+    <select id="jenis">
+      <option value="Masuk">Masuk</option>
+      <option value="Pulang">Pulang</option>
+    </select>
+
     <label>Lokasi</label>
     <input type="text" id="lokasi" readonly />
 
@@ -65,50 +71,60 @@
   </div>
 
 <script>
-  // isi otomatis
-  window.onload = () => {
-    document.getElementById('nip').value = localStorage.getItem('nip') || '';
-    document.getElementById('nama').value = localStorage.getItem('nama') || '';
-    
-    const now = new Date();
-    document.getElementById('tanggal').value = now.toLocaleDateString('id-ID');
-    document.getElementById('jam').value = now.toLocaleTimeString('id-ID');
+document.addEventListener("DOMContentLoaded", () => {
+  // Ambil data dari localStorage (dari login)
+  document.getElementById('nip').value = localStorage.getItem('nip') || '';
+  document.getElementById('nama').value = localStorage.getItem('nama') || '';
+  
+  // Tanggal dan Jam sekarang
+  const now = new Date();
+  const tgl = now.toLocaleDateString('id-ID');
+  const jam = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('tanggal').value = tgl;
+  document.getElementById('jam').value = jam;
 
-    // ambil lokasi
+  // Ambil lokasi GPS
+  if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(pos => {
-      const { latitude, longitude } = pos.coords;
-      document.getElementById('lokasi').value = `${latitude}, ${longitude}`;
+      const lokasi = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+      document.getElementById('lokasi').value = lokasi;
     }, err => {
-      console.warn("Lokasi gagal didapat:", err.message);
+      console.warn("Gagal ambil lokasi", err);
       document.getElementById('lokasi').value = "Tidak tersedia";
     });
   }
+});
 
-  function kirimAbsen() {
-    const data = {
-      nip: document.getElementById('nip').value,
-      nama: document.getElementById('nama').value,
-      tanggal: document.getElementById('tanggal').value,
-      jam: document.getElementById('jam').value,
-      lokasi: document.getElementById('lokasi').value
-    };
+function kirimAbsen() {
+  const data = {
+    nip: document.getElementById('nip').value,
+    nama: document.getElementById('nama').value,
+    tanggal: document.getElementById('tanggal').value,
+    jam: document.getElementById('jam').value,
+    lokasi: document.getElementById('lokasi').value,
+    jenis: document.getElementById('jenis').value,
+  };
 
-    // kirim data ke Apps Script
-    fetch("https://script.google.com/macros/s/AKfycbwLGQ4NfH9Hhx7GahUz8zmPidmgEMYO2rKVcRNcPhHG8hV5-E9UhD0kE1f7qzrvPegz/exec", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" }
-    })
-    .then(res => res.text())
-    .then(res => {
-      alert("Absensi berhasil dikirim!");
-      window.location.href = "home.html";
-    })
-    .catch(err => {
-      console.error("Gagal kirim absensi", err);
-      alert("Gagal kirim absensi.");
-    });
+  if (!data.nip || !data.nama || !data.jenis) {
+    alert("Data tidak lengkap. Pastikan semua field terisi.");
+    return;
   }
+
+  fetch("https://script.google.com/macros/s/AKfycbzlu09G5kLhaY-rtkOs7voX9_XnZlP3dzc59YkzY_ZLwVEAiodut4v-OcMetIaNqHcC/exec", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(res => res.text())
+  .then(res => {
+    alert("✅ Absensi berhasil dikirim!");
+    window.location.href = "home.html";
+  })
+  .catch(err => {
+    console.error("Gagal kirim absensi", err);
+    alert("❌ Gagal kirim absensi.");
+  });
+}
 </script>
 
 </body>
