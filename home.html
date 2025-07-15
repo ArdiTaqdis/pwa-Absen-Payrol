@@ -97,25 +97,26 @@
   </div>
 
   <script>
-    const idTeam = localStorage.getItem('nip'); // masih pakai nip di variabel
-    const nama = localStorage.getItem('nama') || 'Anggota Tim';
+  const idTeam = localStorage.getItem('nip'); // ✅ ambil ID dari localStorage
+  const nama = localStorage.getItem('nama') || 'Anggota Tim';
 
-    if (!nip) {
-      alert("Silakan login terlebih dahulu.");
-      window.location.href = 'index.html';
-    }
-
-    document.getElementById('idTeam').textContent = nip;
+  if (!idTeam) {
+    alert("Silakan login terlebih dahulu.");
+    window.location.href = 'index.html';
+  } else {
+    document.getElementById('idTeam').textContent = idTeam;
     document.getElementById('namaTeam').textContent = nama;
+  }
 
-    function logout() {
-      localStorage.clear();
-      window.location.href = 'index.html';
-    }
+  function logout() {
+    localStorage.clear();
+    window.location.href = 'index.html';
+  }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+</script>
+
 </body>
 </html>

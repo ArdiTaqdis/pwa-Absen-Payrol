@@ -112,7 +112,7 @@ function kirimAbsen() {
 
   fetch("https://script.google.com/macros/s/AKfycbz1j3urx-yL0oaQmUJeu3dfh5wEwFElLdZnN3K96i4j-9cVwLiDQMx2Ci4oQCo9G5MA/exec", {
     method: "POST",
-    mode: "cors",
+    mode: "no-cors",
     body: JSON.stringify(data),
     headers: { "Content-Type": "application/json" }
   })
