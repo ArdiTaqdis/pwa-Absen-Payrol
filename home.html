@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard - Tim SDS Snack</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #fdfdfd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      margin-bottom: 0.2rem;
+      color: #333;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-absen {
+      background: #ff9800;
+      color: white;
+    }
+
+    .btn-rekap {
+      background: #2196f3;
+      color: white;
+    }
+
+    .btn-gaji {
+      background: #4caf50;
+      color: white;
+    }
+
+    .btn-logout {
+      background: #f44336;
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="logo.png" alt="Logo SDS Snack" class="logo" />
+    <h2>SDS Snack</h2>
+    <div class="subtitle">Dashboard Tim SDS Snack</div>
+
+    <div>
+      <p><strong id="namaTeam">Nama Tim</strong><br>
+      <small>ID Tim: <span id="idTeam"></span></small></p>
+    </div>
+
+    <button class="btn-absen" onclick="location.href='form.html'">📝 Absen Sekarang</button>
+    <button class="btn-rekap" onclick="location.href='rekap.html'">📅 Rekap Kehadiran</button>
+    <button class="btn-gaji" onclick="location.href='gaji.html'">💰 Lihat Gaji</button>
+    <button class="btn-logout" onclick="logout()">🔒 Logout</button>
+  </div>
+
+  <script>
+    const idTeam = localStorage.getItem('nip'); // masih pakai nip di variabel
+    const nama = localStorage.getItem('nama') || 'Anggota Tim';
+
+    if (!nip) {
+      alert("Silakan login terlebih dahulu.");
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('idTeam').textContent = nip;
+    document.getElementById('namaTeam').textContent = nama;
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>

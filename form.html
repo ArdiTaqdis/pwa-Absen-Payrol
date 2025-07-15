@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Form Absen - Tim SDS Snack</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 450px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    input, button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    video, img {
+      width: 100%;
+      margin-top: 1rem;
+      border-radius: 10px;
+    }
+    .back {
+      display: inline-block;
+      margin-bottom: 1rem;
+      background: #2196f3;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="home.html" class="back">← Kembali ke Dashboard</a>
+    <h2>Form Absensi Tim SDS Snack</h2>
+
+    <label>ID Tim</label>
+    <input type="text" id="nip" readonly />
+
+    <label>Nama Tim</label>
+    <input type="text" id="nama" readonly />
+
+    <label>Tanggal</label>
+    <input type="text" id="tanggal" readonly />
+
+    <label>Jam</label>
+    <input type="text" id="jam" readonly />
+
+    <label>Lokasi</label>
+    <input type="text" id="lokasi" readonly />
+
+    <label>Selfie</label>
+    <video id="video" autoplay playsinline></video>
+    <button onclick="ambilFoto()">📸 Ambil Foto</button>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <img id="preview" src="" alt="Hasil Foto" />
+
+    <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
+  </div>
+
+  <script>
+    const nip = localStorage.getItem('nip');
+    const nama = localStorage.getItem('nama') || 'Tim SDS Snack';
+
+    if (!nip) {
+      alert("Anda belum login.");
+      window.location.href = "index.html";
+    }
+
+    document.getElementById('nip').value = nip;
+    document.getElementById('nama').value = nama;
+    document.getElementById('tanggal').value = new Date().toLocaleDateString('id-ID');
+    document.getElementById('jam').value = new Date().toLocaleTimeString('id-ID');
+
+    // Ambil Lokasi
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      document.getElementById('lokasi').value = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+    }, () => {
+      alert("Tidak bisa ambil lokasi.");
+    });
+
+    // Aktifkan kamera depan
+    window.onload = function () {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+          .then(stream => {
+            document.getElementById("video").srcObject = stream;
+          })
+          .catch(err => {
+            alert("Gagal membuka kamera: " + err);
+          });
+      } else {
+        alert("Browser tidak mendukung kamera.");
+      }
+    };
+
+    // Ambil foto & ubah ke base64
+    function ambilFoto() {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+
+      const dataUrl = canvas.toDataURL('image/jpeg');
+      document.getElementById('preview').src = dataUrl;
+      document.getElementById('preview').style.display = 'block';
+    }
+
+    // Kirim absen ke Apps Script
+    function kirimAbsen() {
+      const data = {
+        nip: document.getElementById('nip').value,
+        nama: document.getElementById('nama').value,
+        tanggal: document.getElementById('tanggal').value,
+        jam: document.getElementById('jam').value,
+        lokasi: document.getElementById('lokasi').value,
+        fotoBase64: document.getElementById('preview').src
+      };
+
+      if (!data.fotoBase64 || !data.fotoBase64.startsWith('data:image')) {
+        alert("Silakan ambil foto terlebih dahulu.");
+        return;
+      }
+
+      google.script.run.withSuccessHandler(() => {
+        alert("Absensi berhasil disimpan!");
+        window.location.href = "home.html";
+      }).simpanAbsen(data);
+    }
+
+    // PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+</body>
+</html>
