@@ -142,33 +142,12 @@
       }
     }
 
-    async function compressImage(file, quality = 0.6) {
-      return new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = e => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const maxW = 800;
-            const scale = maxW / img.width;
-            canvas.width = maxW;
-            canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality);
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
     async function kirimAbsen() {
       const loading = document.getElementById("loading");
       loading.style.display = "flex";
 
       try {
-        const URL = "https://script.google.com/macros/s/AKfycbx1A9yf1By2XT3Rnk6JMQQKQNEPnIOf2ZVdgyxlcHh7mwuBGj6vLHhHiUttTLLcvFVo/exec";
+        const URL = "https://script.google.com/macros/s/AKfycbzOYXR9X-u7Bp2Sj0p9dOBdNLVZQEa21L8ztR96S362R6bdgBDQdYM5_M_4_-tQtGvQ/exec";
         const nip = document.getElementById('nip').value;
         const nama = document.getElementById('nama').value;
         const tanggal = document.getElementById('tanggal').value;
@@ -183,36 +162,21 @@
           return;
         }
 
-        const fotoKompres = await compressImage(fotoFile, 0.6);
-        const formData = new FormData();
-        formData.append("nip", nip);
-        formData.append("nama", nama);
-        formData.append("tanggal", tanggal);
-        formData.append("jam", jam);
-        formData.append("lokasi", lokasi);
-        formData.append("jenis", jenis);
-        formData.append("foto", fotoKompres, 'foto.jpg');
+        const reader = new FileReader();
+        reader.onloadend = async function () {
+          const base64String = reader.result.split(',')[1];
+          const payload = { nip, nama, tanggal, jam, lokasi, jenis, fotoBase64: base64String };
 
-        console.log("Kirim data utama...");
-        await fetch(URL, { method: "POST", body: formData });
+          await fetch(URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
 
-        const jamInt = new Date().getHours();
-        if (jamInt >= 18) {
-          console.log("Kirim data lembur...");
-          const lemburData = new FormData();
-          lemburData.append("nip", nip);
-          lemburData.append("nama", nama);
-          lemburData.append("tanggal", tanggal);
-          lemburData.append("jam", jam);
-          lemburData.append("lokasi", lokasi);
-          lemburData.append("jenis", "Lembur");
-          lemburData.append("foto", fotoKompres, 'foto.jpg');
-          await fetch(URL, { method: "POST", body: lemburData });
-        }
-
-        alert("✅ Absensi berhasil dikirim!");
-        window.location.href = "home.html";
-
+          alert("✅ Absensi berhasil dikirim!");
+          window.location.href = "home.html";
+        };
+        reader.readAsDataURL(fotoFile);
       } catch (err) {
         console.error("❌ Gagal kirim absensi:", err);
         alert("❌ Gagal kirim absensi.\n" + err.message);
