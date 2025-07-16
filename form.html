@@ -4,18 +4,71 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Form Absen - Tim SDS Snack</title>
+  <link rel="manifest" href="manifest.json" />
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 1rem; }
-    .container { max-width: 450px; margin: auto; background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.1); position: relative; }
-    h2 { text-align: center; }
-    input, select, button { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border-radius: 5px; border: 1px solid #ccc; }
-    #preview { max-width: 100px; display: none; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 5px; object-fit: cover; }
-    #loading { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.8); display: none; justify-content: center; align-items: center; font-weight: bold; font-size: 1.2em; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 1rem;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 450px;
+      margin: auto;
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .back {
+      display: inline-block;
+      margin-bottom: 1rem;
+      background: #2196f3;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 5px;
+      text-decoration: none;
+    }
+    #preview {
+      max-width: 80px;
+      max-height: 80px;
+      display: none;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+      object-fit: cover;
+    }
+    #loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.2em;
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div id="loading">Mengirim...</div>
+    <a href="home.html" class="back">← Kembali ke Dashboard</a>
     <h2>Form Absensi Tim SDS Snack</h2>
 
     <label>ID Tim</label>
@@ -54,15 +107,19 @@
       document.getElementById('nama').value = nama;
 
       const now = new Date();
-      document.getElementById('tanggal').value = now.toLocaleDateString('id-ID');
-      document.getElementById('jam').value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      const tgl = now.toLocaleDateString('id-ID');
+      const jam = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('tanggal').value = tgl;
+      document.getElementById('jam').value = jam;
 
       const jamInt = now.getHours();
-      document.getElementById('jenis').value = (jamInt >= 5 && jamInt < 12) ? "Masuk" : "Pulang";
+      if (jamInt >= 5 && jamInt < 12) document.getElementById('jenis').value = "Masuk";
+      else if (jamInt >= 12 && jamInt <= 23) document.getElementById('jenis').value = "Pulang";
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
-          document.getElementById('lokasi').value = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+          const lokasi = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+          document.getElementById('lokasi').value = lokasi;
         }, () => {
           document.getElementById('lokasi').value = "Tidak tersedia";
         });
@@ -92,8 +149,9 @@
           const img = new Image();
           img.onload = () => {
             const canvas = document.createElement('canvas');
-            const scale = 800 / img.width;
-            canvas.width = 800;
+            const maxW = 800;
+            const scale = maxW / img.width;
+            canvas.width = maxW;
             canvas.height = img.height * scale;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
@@ -108,7 +166,9 @@
     async function kirimAbsen() {
       const loading = document.getElementById("loading");
       loading.style.display = "flex";
+
       try {
+        const URL = "https://script.google.com/macros/s/AKfycbz-nQCNVbyhr8vEzoXMC_Uhj2sEqojRGwyYN86w_dtxwqFlyX_ABM4OM5W3usct15RV/exec";
         const nip = document.getElementById('nip').value;
         const nama = document.getElementById('nama').value;
         const tanggal = document.getElementById('tanggal').value;
@@ -124,58 +184,47 @@
         }
 
         const fotoKompres = await compressImage(fotoFile, 0.6);
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64Image = reader.result.split(',')[1];
-          const payload = { nip, nama, tanggal, jam, lokasi, jenis, fotoBase64: base64Image };
+        const formData = new FormData();
+        formData.append("nip", nip);
+        formData.append("nama", nama);
+        formData.append("tanggal", tanggal);
+        formData.append("jam", jam);
+        formData.append("lokasi", lokasi);
+        formData.append("jenis", jenis);
+        formData.append("foto", fotoKompres, 'foto.jpg');
 
-          const GAS_URL = "https://script.google.com/macros/s/AKfycbzqQlMIZXPnFvKgLRbEbbCGLpJbvt_6qo3g7Hp90Xe1Ei6-Nzn57D6mtgLBUL8FSMgm/exec";
-          const URL = "https://corsproxy.io/?" + encodeURIComponent(GAS_URL);
+        console.log("Kirim data utama...");
+        await fetch(URL, { method: "POST", body: formData });
 
-          try {
-            const res = await fetch(URL, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            });
+        const jamInt = new Date().getHours();
+        if (jamInt >= 18) {
+          console.log("Kirim data lembur...");
+          const lemburData = new FormData();
+          lemburData.append("nip", nip);
+          lemburData.append("nama", nama);
+          lemburData.append("tanggal", tanggal);
+          lemburData.append("jam", jam);
+          lemburData.append("lokasi", lokasi);
+          lemburData.append("jenis", "Lembur");
+          lemburData.append("foto", fotoKompres, 'foto.jpg');
+          await fetch(URL, { method: "POST", body: lemburData });
+        }
 
-            if (!res.ok) {
-              const errorText = await res.text();
-              console.error("❌ Server error:", errorText);
-              alert("❌ Gagal mengirim absensi: server tidak merespons dengan benar.");
-              return;
-            }
+        alert("✅ Absensi berhasil dikirim!");
+        window.location.href = "home.html";
 
-            let result;
-            try {
-              result = await res.json();
-            } catch (jsonErr) {
-              const raw = await res.text();
-              console.error("❌ Gagal parsing JSON:", raw);
-              alert("❌ Server mengirim respons tidak valid.");
-              return;
-            }
-
-            if (result.success) {
-              alert("✅ Absensi berhasil dikirim!");
-              window.location.href = "home.html";
-            } else {
-              alert("❌ Gagal: " + result.error);
-            }
-
-          } catch (fetchErr) {
-            console.error("❌ Fetch error:", fetchErr);
-            alert("❌ Terjadi kesalahan jaringan saat mengirim absensi.");
-          } finally {
-            loading.style.display = "none";
-          }
-        };
-        reader.readAsDataURL(fotoKompres);
       } catch (err) {
-        console.error("❌ Unexpected error:", err);
-        alert("❌ Gagal kirim absen: " + err.message);
+        console.error("❌ Gagal kirim absensi:", err);
+        alert("❌ Gagal kirim absensi.\n" + err.message);
+      } finally {
         loading.style.display = "none";
       }
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.log("❌ SW failed:", err));
     }
   </script>
 </body>
