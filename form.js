@@ -1,4 +1,4 @@
-const URL = 'https://script.google.com/macros/s/AKfycbxXXXXX/exec'; // ganti dengan URL WebApp kamu
+const URL = 'https://script.google.com/macros/s/AKfycbyG-LnGjIUAFUn67DdaXaHkeYZBa3e3rgAeaCqeYlH9LFLvzN2I9fA_hVfEef3LVfGV/exec'; // ganti dengan URL WebApp kamu
 
 document.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
