@@ -66,6 +66,10 @@
     <label>Lokasi</label>
     <input type="text" id="lokasi" readonly />
 
+    <label>Foto Ruang</label>
+    <input type="file" id="foto" accept="image/*" capture="environment" />
+
+
     <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
   </div>
 
@@ -104,47 +108,60 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function kirimAbsen() {
-  const URL = "https://script.google.com/macros/s/AKfycbx_Q0ADv2Fzy9a0QTBef-Hsry5ZKgn0vcHtziBtsfCSJ4Pawz_u8nONkX3rKodo1sTQ/exec"; // ← Ganti dengan URL Web App kamu
+  const URL = "https://script.google.com/macros/s/AKfycbz-nQCNVbyhr8vEzoXMC_Uhj2sEqojRGwyYN86w_dtxwqFlyX_ABM4OM5W3usct15RV/exec"; // Ganti dengan URL Anda
 
+  const nip = document.getElementById('nip').value;
+  const nama = document.getElementById('nama').value;
+  const tanggal = document.getElementById('tanggal').value;
+  const jam = document.getElementById('jam').value;
+  const lokasi = document.getElementById('lokasi').value;
   const jenis = document.getElementById('jenis').value;
-  const jamInt = new Date().getHours();
+  const foto = document.getElementById('foto').files[0];
 
-  const data = {
-    nip: document.getElementById('nip').value,
-    nama: document.getElementById('nama').value,
-    tanggal: document.getElementById('tanggal').value,
-    jam: document.getElementById('jam').value,
-    lokasi: document.getElementById('lokasi').value,
-    jenis: jenis,
-  };
-
-  if (!data.nip || !data.nama || !data.jenis || !data.lokasi || data.lokasi === "Tidak tersedia") {
-    alert("Data belum lengkap atau lokasi belum tersedia.");
+  if (!nip || !nama || !jenis || !lokasi || lokasi === "Tidak tersedia" || !foto) {
+    alert("Data belum lengkap atau foto/lokasi belum tersedia.");
     return;
   }
 
-  // Kirim absensi utama
+  const formData = new FormData();
+  formData.append("nip", nip);
+  formData.append("nama", nama);
+  formData.append("tanggal", tanggal);
+  formData.append("jam", jam);
+  formData.append("lokasi", lokasi);
+  formData.append("jenis", jenis);
+  formData.append("foto", foto); // penting!
+
   fetch(URL, {
     method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
+    body: formData
+  })
+  .then(() => {
+    // Lembur otomatis (jika jam ≥ 18)
+    const jamInt = new Date().getHours();
+    if (jamInt >= 18) {
+      const lemburData = new FormData();
+      lemburData.append("nip", nip);
+      lemburData.append("nama", nama);
+      lemburData.append("tanggal", tanggal);
+      lemburData.append("jam", jam);
+      lemburData.append("lokasi", lokasi);
+      lemburData.append("jenis", "Lembur");
+      lemburData.append("foto", foto);
+
+      return fetch(URL, { method: "POST", body: lemburData });
+    }
+  })
+  .then(() => {
+    alert("✅ Absensi berhasil dikirim!");
+    window.location.href = "home.html";
+  })
+  .catch(err => {
+    console.error("Gagal kirim", err);
+    alert("❌ Gagal kirim absensi.");
   });
-
-  // Kirim lembur jika malam
-  if (jamInt >= 18) {
-    const dataLembur = { ...data, jenis: "Lembur" };
-    fetch(URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(dataLembur)
-    });
-  }
-
-  alert("✅ Absensi berhasil dikirim!");
-  window.location.href = "home.html";
 }
+
 </script>
 
 </body>

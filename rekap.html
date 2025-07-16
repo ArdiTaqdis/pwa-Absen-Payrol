@@ -23,10 +23,23 @@
       text-align: center;
       margin-bottom: 1.5rem;
     }
+    .back {
+      margin-bottom: 1rem;
+      display: inline-block;
+      text-decoration: none;
+      background: #2196f3;
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 5px;
+    }
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
+      min-width: 600px;
     }
     th, td {
       padding: 0.75rem;
@@ -36,19 +49,6 @@
     th {
       background-color: #ff9800;
       color: white;
-    }
-    img {
-      width: 80px;
-      border-radius: 5px;
-    }
-    .back {
-      margin-bottom: 1rem;
-      display: inline-block;
-      text-decoration: none;
-      background: #2196f3;
-      color: white;
-      padding: 0.6rem 1rem;
-      border-radius: 5px;
     }
     #loading {
       text-align: center;
@@ -65,19 +65,20 @@
 
     <div id="loading">🔄 Memuat data kehadiran...</div>
 
-    <table id="tabelRekap" style="display:none;">
-      <thead>
-        <tr>
-          <th>Timestamp</th>
-          <th>Tanggal</th>
-          <th>Jam</th>
-          <th>Jenis</th>
-          <th>Lokasi</th>
-          <th>Foto</th>
-        </tr>
-      </thead>
-      <tbody id="isiTabel"></tbody>
-    </table>
+    <div class="table-container">
+      <table id="tabelRekap" style="display:none;">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Tanggal</th>
+            <th>Jam</th>
+            <th>Jenis</th>
+            <th>Lokasi</th>
+          </tr>
+        </thead>
+        <tbody id="isiTabel"></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
@@ -101,7 +102,7 @@
           loading.style.display = "none";
 
           if (!data || data.length === 0) {
-            tbody.innerHTML = "<tr><td colspan='6'>Data tidak ditemukan.</td></tr>";
+            tbody.innerHTML = "<tr><td colspan='5'>Data tidak ditemukan.</td></tr>";
             tabel.style.display = "table";
             return;
           }
@@ -114,7 +115,6 @@
               <td>${item.jam}</td>
               <td>${item.jenis}</td>
               <td>${item.lokasi}</td>
-              <td><img src="${item.foto}" alt="Foto" /></td>
             `;
             tbody.appendChild(row);
           });
@@ -123,7 +123,7 @@
         })
         .catch(err => {
           console.error("Gagal ambil data:", err);
-          alert("Gagal mengambil data kehadiran.");
+          alert("❌ Gagal mengambil data kehadiran.");
           document.getElementById("loading").textContent = "❌ Gagal memuat data.";
         });
     }
