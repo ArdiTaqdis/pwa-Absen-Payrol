@@ -7,14 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById('nama').value = nama;
 
   const now = new Date();
-  const tgl = now.toLocaleDateString('id-ID');
-  const jam = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-  document.getElementById('tanggal').value = tgl;
-  document.getElementById('jam').value = jam;
+  document.getElementById('tanggal').value = now.toLocaleDateString('id-ID');
+  document.getElementById('jam').value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
   const jamInt = now.getHours();
-  if (jamInt >= 5 && jamInt < 12) document.getElementById('jenis').value = "Masuk";
-  else if (jamInt >= 12 && jamInt <= 23) document.getElementById('jenis').value = "Pulang";
+  document.getElementById('jenis').value = (jamInt >= 5 && jamInt < 12) ? "Masuk" : "Pulang";
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(pos => {
@@ -24,11 +21,34 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById('lokasi').value = "Tidak tersedia";
     });
   }
+
+  // Preview foto otomatis
+  document.getElementById('foto').addEventListener('change', () => {
+    const input = document.getElementById('foto');
+    const preview = document.getElementById('preview');
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  });
 });
 
+async function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result); // full base64 string
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 async function kirimAbsen() {
-  const loading = document.getElementById("loading");
   const tombol = document.querySelector("button");
+  const loading = document.getElementById("loading");
   tombol.disabled = true;
   loading.style.display = "flex";
 
@@ -40,22 +60,16 @@ async function kirimAbsen() {
     const lokasi = document.getElementById("lokasi").value;
     const jenis = document.getElementById("jenis").value;
 
-    if (!nip || !nama || !tanggal || !jam || !lokasi) {
-      alert("❌ Data belum lengkap.");
-      return;
-    }
+    const file = document.getElementById("foto").files[0];
+    let foto = "";
+    if (file) foto = await toBase64(file);
 
-    const formData = new FormData();
-    formData.append("nip", nip);
-    formData.append("nama", nama);
-    formData.append("tanggal", tanggal);
-    formData.append("jam", jam);
-    formData.append("lokasi", lokasi);
-    formData.append("jenis", jenis);
+    const payload = { nip, nama, tanggal, jam, lokasi, jenis, foto };
 
     const res = await fetch(URL, {
       method: "POST",
-      body: formData
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
 
     const result = await res.json();
@@ -65,7 +79,6 @@ async function kirimAbsen() {
     } else {
       throw new Error(result.error || "Gagal kirim.");
     }
-
   } catch (err) {
     console.error("❌ Gagal:", err);
     alert("❌ Gagal kirim: " + err.message);
