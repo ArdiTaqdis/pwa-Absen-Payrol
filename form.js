@@ -1,4 +1,4 @@
-const URL = 'https://script.google.com/macros/s/AKfycbw8QwavNc7PDm56UT1jtNqdMXhv9Q9loaCQaw8O0O1HK0plQ5rZb09SdBDrVKkdRHt5/exec'; // Ganti dengan URL WebApp kamu
+const URL = 'https://script.google.com/macros/s/AKfycbxXXXXX/exec'; // ganti dengan URL WebApp kamu
 
 document.addEventListener("DOMContentLoaded", () => {
   const now = new Date();
@@ -13,13 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.getElementById('foto').addEventListener('change', previewFoto);
-  document.getElementById('btnKirim').addEventListener('click', kirimAbsen);
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(() => console.log("✅ Service Worker terdaftar"))
-      .catch(err => console.error("❌ Gagal daftar SW:", err));
-  }
 });
 
 function previewFoto() {
@@ -35,7 +28,7 @@ function previewFoto() {
   }
 }
 
-function kirimAbsen() {
+async function kirimAbsen() {
   const loading = document.getElementById("loading");
   loading.style.display = "flex";
 

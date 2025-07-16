@@ -2,47 +2,10 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Form Absensi Tim SDS Snack</title>
-  <link rel="manifest" href="manifest.json">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 1rem;
-      background-color: #f4f4f4;
-    }
-    .container {
-      max-width: 480px;
-      margin: auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 0.8rem;
-      margin-bottom: 1rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    #preview {
-      max-width: 100px;
-      display: none;
-      margin-bottom: 1rem;
-      border-radius: 5px;
-    }
-    #loading {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-    }
-  </style>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
@@ -59,11 +22,18 @@
     </select>
     <input type="text" id="lokasi" readonly />
     <input type="file" id="foto" accept="image/*" />
-    <img id="preview" />
+    <img id="preview" style="display:none; max-width:100px;" />
 
-    <button id="btnKirim">✅ Kirim Absensi</button>
+    <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
   </div>
 
   <script src="form.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.error("❌ SW gagal:", err));
+    }
+  </script>
 </body>
 </html>
