@@ -18,6 +18,7 @@
       padding: 2rem;
       border-radius: 10px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      position: relative;
     }
     h2 {
       text-align: center;
@@ -39,89 +40,61 @@
       border-radius: 5px;
       text-decoration: none;
     }
+    #preview {
+      max-width: 80px;
+      max-height: 80px;
+      display: none;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 1rem;
+      object-fit: cover;
+    }
+    #loading {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <div id="loading">Mengirim...</div>
     <a href="home.html" class="back">← Kembali ke Dashboard</a>
     <h2>Form Absensi Tim SDS Snack</h2>
 
-    <label for="nip">ID Tim</label>
+    <label>ID Tim</label>
     <input type="text" id="nip" readonly />
 
-    <label for="nama">Nama Tim</label>
+    <label>Nama Tim</label>
     <input type="text" id="nama" readonly />
 
-    <label for="tanggal">Tanggal</label>
+    <label>Tanggal</label>
     <input type="text" id="tanggal" readonly />
 
-    <label for="jam">Jam</label>
+    <label>Jam</label>
     <input type="text" id="jam" readonly />
 
-    <label for="jenis">Jenis Absen</label>
+    <label>Jenis Absen</label>
     <select id="jenis">
       <option value="Masuk">Masuk</option>
       <option value="Pulang">Pulang</option>
     </select>
 
-    <label for="lokasi">Lokasi</label>
+    <label>Lokasi</label>
     <input type="text" id="lokasi" readonly />
+
+    <label>Foto Ruang</label>
+    <input type="file" id="foto" accept="image/*" capture="environment" onchange="previewFoto()" />
+    <img id="preview" />
 
     <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
   </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById('nip').value = localStorage.getItem('nip') || '';
-      document.getElementById('nama').value = localStorage.getItem('nama') || '';
-
-      const now = new Date();
-      document.getElementById('tanggal').value = now.toLocaleDateString('id-ID');
-      document.getElementById('jam').value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(pos => {
-          const lokasi = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-          document.getElementById('lokasi').value = lokasi;
-        }, err => {
-          console.warn("Gagal ambil lokasi", err);
-          document.getElementById('lokasi').value = "Tidak tersedia";
-        });
-      } else {
-        document.getElementById('lokasi').value = "Geolocation tidak didukung";
-      }
-    });
-
-    function kirimAbsen() {
-      const data = {
-        nip: document.getElementById('nip').value,
-        nama: document.getElementById('nama').value,
-        tanggal: document.getElementById('tanggal').value,
-        jam: document.getElementById('jam').value,
-        lokasi: document.getElementById('lokasi').value,
-        jenis: document.getElementById('jenis').value,
-      };
-
-      if (!data.nip || !data.nama || !data.jenis || !data.lokasi || data.lokasi === "Tidak tersedia") {
-        alert("❌ Data belum lengkap atau lokasi belum tersedia.");
-        return;
-      }
-
-      fetch("https://script.google.com/macros/s/AKfycbwQ6rkpdrDm6hBVZVeI32RcLmk0U-SwroakuhoIazmQ57foakgIjrDA18c6HNOk8kAH/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-      })
-      .then(res => res.text())
-      .then(res => {
-        alert("✅ Absensi berhasil dikirim!");
-        window.location.href = "home.html";
-      })
-      .catch(err => {
-        console.error("❌ Gagal kirim absensi", err);
-        alert("❌ Gagal kirim absensi. Silakan coba lagi.");
-      });
-    }
-  </script>
+  <script src="form.js"></script>
 </body>
 </html>
