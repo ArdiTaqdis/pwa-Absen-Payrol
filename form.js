@@ -53,11 +53,11 @@ function toBase64(file) {
 
 async function kirimAbsen() {
   const loading = document.getElementById("loading");
+  const tombol = document.querySelector("button");
+  tombol.disabled = true;
   loading.style.display = "flex";
 
   try {
-    const URL = "https://script.google.com/macros/s/AKfycbxLG4oswkyC2SN5utgNesTQIpftbqC2YAHUHfn2eKMIbqozjsAwz1_EkW6xMErwqF5y/exec";
-
     const nip = document.getElementById("nip").value;
     const nama = document.getElementById("nama").value;
     const tanggal = document.getElementById("tanggal").value;
@@ -68,17 +68,21 @@ async function kirimAbsen() {
 
     if (!nip || !nama || !tanggal || !jam || !lokasi || !file) {
       alert("Data belum lengkap.");
-      loading.style.display = "none";
       return;
     }
 
-    const fotoBase64 = await toBase64(file);
-    const data = { nip, nama, tanggal, jam, lokasi, jenis, foto: fotoBase64 };
+    const formData = new FormData();
+    formData.append("nip", nip);
+    formData.append("nama", nama);
+    formData.append("tanggal", tanggal);
+    formData.append("jam", jam);
+    formData.append("lokasi", lokasi);
+    formData.append("jenis", jenis);
+    formData.append("foto", file);
 
     const res = await fetch(URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: formData
     });
 
     const result = await res.json();
@@ -94,5 +98,6 @@ async function kirimAbsen() {
     alert("❌ Gagal kirim: " + err.message);
   } finally {
     loading.style.display = "none";
+    tombol.disabled = false;
   }
 }
