@@ -129,7 +129,10 @@
           const base64Image = reader.result.split(',')[1];
           const payload = { nip, nama, tanggal, jam, lokasi, jenis, fotoBase64: base64Image };
 
-          const URL = "https://script.google.com/macros/s/AKfycbzqQlMIZXPnFvKgLRbEbbCGLpJbvt_6qo3g7Hp90Xe1Ei6-Nzn57D6mtgLBUL8FSMgm/exec";
+          // Gunakan proxy untuk bypass CORS
+          const GAS_URL = "https://script.google.com/macros/s/AKfycbzqQlMIZXPnFvKgLRbEbbCGLpJbvt_6qo3g7Hp90Xe1Ei6-Nzn57D6mtgLBUL8FSMgm/exec";
+          const URL = "https://corsproxy.io/?" + encodeURIComponent(GAS_URL);
+
           const res = await fetch(URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
