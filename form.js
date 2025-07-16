@@ -1,4 +1,4 @@
-const URL = 'https://script.google.com/macros/s/AKfycbxLG4oswkyC2SN5utgNesTQIpftbqC2YAHUHfn2eKMIbqozjsAwz1_EkW6xMErwqF5y/exec'; // ganti dengan URL WebApp kamu
+const URL = 'https://script.google.com/macros/s/AKfycbyNiGjiDsx79Q_59psH8NrnfqJNZPyeFNaxYJqVw7AU16X4h66H2Xb2DH-HWjS6ZDWj/exec';
 
 document.addEventListener("DOMContentLoaded", () => {
   const nip = localStorage.getItem('nip') || '';
@@ -26,31 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-function previewFoto() {
-  const input = document.getElementById('foto');
-  const preview = document.getElementById('preview');
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = e => {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(input.files[0]);
-  } else {
-    preview.src = '';
-    preview.style.display = 'none';
-  }
-}
-
-function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 async function kirimAbsen() {
   const loading = document.getElementById("loading");
   const tombol = document.querySelector("button");
@@ -64,10 +39,9 @@ async function kirimAbsen() {
     const jam = document.getElementById("jam").value;
     const lokasi = document.getElementById("lokasi").value;
     const jenis = document.getElementById("jenis").value;
-    const file = document.getElementById("foto").files[0];
 
-    if (!nip || !nama || !tanggal || !jam || !lokasi || !file) {
-      alert("Data belum lengkap.");
+    if (!nip || !nama || !tanggal || !jam || !lokasi) {
+      alert("❌ Data belum lengkap.");
       return;
     }
 
@@ -78,7 +52,6 @@ async function kirimAbsen() {
     formData.append("jam", jam);
     formData.append("lokasi", lokasi);
     formData.append("jenis", jenis);
-    formData.append("foto", file);
 
     const res = await fetch(URL, {
       method: "POST",

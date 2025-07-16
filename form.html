@@ -40,15 +40,6 @@
       border-radius: 5px;
       text-decoration: none;
     }
-    #preview {
-      max-width: 80px;
-      max-height: 80px;
-      display: none;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      margin-bottom: 1rem;
-      object-fit: cover;
-    }
     #loading {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -87,10 +78,6 @@
 
     <label>Lokasi</label>
     <input type="text" id="lokasi" readonly />
-
-    <label>Foto Ruang</label>
-    <input type="file" id="foto" accept="image/*" capture="environment" onchange="previewFoto()" />
-    <img id="preview" />
 
     <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
   </div>
