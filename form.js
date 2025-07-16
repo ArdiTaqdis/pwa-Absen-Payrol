@@ -1,4 +1,4 @@
-const URL = 'https://script.google.com/macros/s/AKfycbzqwnR2fpBSjHlnudDwDc-5cky-4eP0HkO_lZU9CSGqhKxcgvr1wYsqh5cy6g6vPj9D/exec';
+const URL = 'https://script.google.com/macros/s/AKfycbzVWQvgisgUG93gJguQ2tLjL6W071GhEKziKdwCPf_Obu8Fz7qVZxl6PbBGZyWwXZ_Y/exec';
 
 document.addEventListener("DOMContentLoaded", () => {
   const nip = localStorage.getItem('nip') || '';
