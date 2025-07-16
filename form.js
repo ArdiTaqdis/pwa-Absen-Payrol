@@ -1,4 +1,4 @@
-const URL = 'https://script.google.com/macros/s/AKfycbzOJrcCx1yeaVxtaZ-DuHuKPFMS28qnzmky2kZmlBEbRgtcNmgHHc81M5mQ_PxULv3R/exec'; // ganti dengan URL WebApp kamu
+const URL = 'https://script.google.com/macros/s/AKfycbxLG4oswkyC2SN5utgNesTQIpftbqC2YAHUHfn2eKMIbqozjsAwz1_EkW6xMErwqF5y/exec'; // ganti dengan URL WebApp kamu
 
 document.addEventListener("DOMContentLoaded", () => {
   const nip = localStorage.getItem('nip') || '';
@@ -56,7 +56,7 @@ async function kirimAbsen() {
   loading.style.display = "flex";
 
   try {
-    const URL = "https://script.google.com/macros/s/AKfycbx1A9yf1By2XT3Rnk6JMQQKQNEPnIOf2ZVdgyxlcHh7mwuBGj6vLHhHiUttTLLcvFVo/exec";
+    const URL = "https://script.google.com/macros/s/AKfycbxLG4oswkyC2SN5utgNesTQIpftbqC2YAHUHfn2eKMIbqozjsAwz1_EkW6xMErwqF5y/exec";
 
     const nip = document.getElementById("nip").value;
     const nama = document.getElementById("nama").value;
