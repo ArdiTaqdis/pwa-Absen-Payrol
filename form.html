@@ -70,6 +70,11 @@
     <label>Foto Ruang</label>
     <input type="file" id="foto" accept="image/*" capture="environment" />
 
+    <label>Foto Ruang</label>
+    <input type="file" id="foto" accept="image/*" capture="environment" onchange="previewFoto()" />
+    <img id="preview" style="max-width: 100px; display: none; border:1px solid #ccc; border-radius:5px; margin-bottom:1rem;" />
+
+
 
     <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
   </div>
@@ -172,6 +177,25 @@ function kirimAbsen() {
       .then(() => console.log("✅ Service Worker registered"))
       .catch(err => console.log("❌ SW failed:", err));
   }
+</script>
+
+<script>
+function previewFoto() {
+  const input = document.getElementById('foto');
+  const preview = document.getElementById('preview');
+
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(input.files[0]);
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+}
 </script>
 
 
