@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Form Absen - Tim SDS Snack</title>
-  <link rel="manifest" href="manifest.json" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Absensi Tim SDS Snack</title>
+  <link rel="manifest" href="manifest.json">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,17 +12,13 @@
       background-color: #f4f4f4;
     }
     .container {
-      max-width: 450px;
+      max-width: 480px;
       margin: auto;
       background: #fff;
       padding: 2rem;
       border-radius: 10px;
       box-shadow: 0 3px 8px rgba(0,0,0,0.1);
       position: relative;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 1rem;
     }
     input, select, button {
       width: 100%;
@@ -31,97 +27,55 @@
       border-radius: 5px;
       border: 1px solid #ccc;
     }
-    .back {
-      display: inline-block;
-      margin-bottom: 1rem;
-      background: #2196f3;
-      color: white;
-      padding: 0.6rem 1rem;
-      border-radius: 5px;
-      text-decoration: none;
-    }
     #preview {
-      max-width: 80px;
-      max-height: 80px;
+      max-width: 100px;
       display: none;
-      border: 1px solid #ccc;
-      border-radius: 5px;
       margin-bottom: 1rem;
-      object-fit: cover;
+      border-radius: 5px;
     }
     #loading {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(255,255,255,0.8);
-      display: flex;
+      display: none;
       justify-content: center;
       align-items: center;
       font-weight: bold;
-      font-size: 1.2em;
-      display: none;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <div id="loading">Mengirim...</div>
-    <a href="home.html" class="back">← Kembali ke Dashboard</a>
+    <div id="loading">⏳ Mengirim data...</div>
     <h2>Form Absensi Tim SDS Snack</h2>
 
-    <label>ID Tim</label>
-    <input type="text" id="nip" readonly />
-
-    <label>Nama Tim</label>
-    <input type="text" id="nama" readonly />
-
-    <label>Tanggal</label>
+    <input type="text" id="nip" placeholder="NIP" />
+    <input type="text" id="nama" placeholder="Nama Tim" />
     <input type="text" id="tanggal" readonly />
-
-    <label>Jam</label>
     <input type="text" id="jam" readonly />
-
-    <label>Jenis Absen</label>
     <select id="jenis">
       <option value="Masuk">Masuk</option>
       <option value="Pulang">Pulang</option>
     </select>
-
-    <label>Lokasi</label>
     <input type="text" id="lokasi" readonly />
-
-    <label>Foto Ruang</label>
-    <input type="file" id="foto" accept="image/*" capture="environment" onchange="previewFoto()" />
+    <input type="file" id="foto" accept="image/*" onchange="previewFoto()" />
     <img id="preview" />
 
     <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
   </div>
 
   <script>
+    const URL = 'https://script.google.com/macros/s/AKfycbyyQRktI75M6zU4-0smbyRLTlIzTVm_A81HG47Yd0tNOL3lzVjcZsFomiistIDV50O-/exec'; // Ganti dengan URL Web App kamu
+
     document.addEventListener("DOMContentLoaded", () => {
-      const nip = localStorage.getItem('nip') || '';
-      const nama = localStorage.getItem('nama') || '';
-      document.getElementById('nip').value = nip;
-      document.getElementById('nama').value = nama;
-
       const now = new Date();
-      const tgl = now.toLocaleDateString('id-ID');
-      const jam = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-      document.getElementById('tanggal').value = tgl;
-      document.getElementById('jam').value = jam;
-
-      const jamInt = now.getHours();
-      if (jamInt >= 5 && jamInt < 12) document.getElementById('jenis').value = "Masuk";
-      else if (jamInt >= 12 && jamInt <= 23) document.getElementById('jenis').value = "Pulang";
+      document.getElementById("tanggal").value = now.toLocaleDateString('id-ID');
+      document.getElementById("jam").value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(pos => {
           const lokasi = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
-          document.getElementById('lokasi').value = lokasi;
-        }, () => {
-          document.getElementById('lokasi').value = "Tidak tersedia";
+          document.getElementById("lokasi").value = lokasi;
         });
       }
     });
@@ -136,59 +90,60 @@
           preview.style.display = 'block';
         };
         reader.readAsDataURL(input.files[0]);
-      } else {
-        preview.src = '';
-        preview.style.display = 'none';
       }
     }
 
-    async function kirimAbsen() {
+    function kirimAbsen() {
       const loading = document.getElementById("loading");
       loading.style.display = "flex";
 
-      try {
-        const URL = "https://script.google.com/macros/s/AKfycbzOYXR9X-u7Bp2Sj0p9dOBdNLVZQEa21L8ztR96S362R6bdgBDQdYM5_M_4_-tQtGvQ/exec";
-        const nip = document.getElementById('nip').value;
-        const nama = document.getElementById('nama').value;
-        const tanggal = document.getElementById('tanggal').value;
-        const jam = document.getElementById('jam').value;
-        const lokasi = document.getElementById('lokasi').value;
-        const jenis = document.getElementById('jenis').value;
-        const fotoFile = document.getElementById('foto').files[0];
+      const nip = document.getElementById('nip').value.trim();
+      const nama = document.getElementById('nama').value.trim();
+      const tanggal = document.getElementById('tanggal').value;
+      const jam = document.getElementById('jam').value;
+      const jenis = document.getElementById('jenis').value;
+      const lokasi = document.getElementById('lokasi').value;
+      const fotoFile = document.getElementById('foto').files[0];
 
-        if (!nip || !nama || !jenis || !lokasi || lokasi === "Tidak tersedia" || !fotoFile) {
-          alert("Data belum lengkap atau foto/lokasi belum tersedia.");
-          loading.style.display = "none";
-          return;
-        }
+      if (!nip || !nama || !lokasi || !fotoFile) {
+        alert("⚠️ Lengkapi semua data dan upload foto.");
+        loading.style.display = "none";
+        return;
+      }
 
-        const reader = new FileReader();
-        reader.onloadend = async function () {
+      const reader = new FileReader();
+      reader.onloadend = async function () {
+        try {
           const base64String = reader.result.split(',')[1];
-          const payload = { nip, nama, tanggal, jam, lokasi, jenis, fotoBase64: base64String };
+          const payload = { nip, nama, tanggal, jam, jenis, lokasi, fotoBase64: base64String };
 
-          await fetch(URL, {
+          const res = await fetch(URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
           });
 
-          alert("✅ Absensi berhasil dikirim!");
-          window.location.href = "home.html";
-        };
-        reader.readAsDataURL(fotoFile);
-      } catch (err) {
-        console.error("❌ Gagal kirim absensi:", err);
-        alert("❌ Gagal kirim absensi.\n" + err.message);
-      } finally {
-        loading.style.display = "none";
-      }
+          const json = await res.json();
+          if (json.success) {
+            alert("✅ Absensi berhasil dikirim!");
+            location.reload();
+          } else {
+            alert("❌ Gagal: " + (json.error || "Tidak diketahui"));
+          }
+        } catch (err) {
+          alert("❌ Gagal kirim: " + err.message);
+        } finally {
+          loading.style.display = "none";
+        }
+      };
+
+      reader.readAsDataURL(fotoFile);
     }
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log("✅ Service Worker registered"))
-        .catch(err => console.log("❌ SW failed:", err));
+        .then(() => console.log("✅ Service Worker terdaftar"))
+        .catch(err => console.error("❌ Gagal daftar SW:", err));
     }
   </script>
 </body>
