@@ -1,68 +1,135 @@
-const URL = 'https://script.google.com/macros/s/AKfycbwCfvdu9ouEU-OgZh9UTMEELGs-kbNEfRWnL82lrLXj1Dey5nIklaJcLmIm4DsrYQuV/exec';
+function getQueryParam(key) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(key);
+}
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Isi otomatis nip dan nama dari localStorage
-  const nip = localStorage.getItem('nip') || '';
-  const nama = localStorage.getItem('nama') || '';
-  document.getElementById('nip').value = nip;
-  document.getElementById('nama').value = nama;
+window.onload = function () {
+  const nip = getQueryParam("nip");
+  const nama = getQueryParam("nama");
 
-  // Tanggal dan Jam
-  const now = new Date();
-  document.getElementById('tanggal').value = now.toLocaleDateString('id-ID');
-  document.getElementById('jam').value = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-
-  // Lokasi (Geolocation)
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const lat = position.coords.latitude.toFixed(5);
-        const lon = position.coords.longitude.toFixed(5);
-        document.getElementById('lokasi').value = `${lat}, ${lon}`;
-      },
-      (err) => {
-        document.getElementById('lokasi').value = "Tidak tersedia";
-      }
-    );
-  } else {
-    document.getElementById('lokasi').value = "Tidak didukung";
-  }
-});
-
-function kirimAbsen() {
-  const loading = document.getElementById('loading');
-  loading.style.display = 'flex';
-
-  const data = {
-    nip: document.getElementById('nip').value,
-    nama: document.getElementById('nama').value,
-    tanggal: document.getElementById('tanggal').value,
-    jam: document.getElementById('jam').value,
-    lokasi: document.getElementById('lokasi').value,
-    jenis: document.getElementById('jenis').value,
-  };
-
-  // Validasi
-  if (!data.nip || !data.nama || !data.jenis || !data.lokasi || data.lokasi === "Tidak tersedia") {
-    alert("❌ Data belum lengkap atau lokasi belum tersedia.");
-    loading.style.display = 'none';
+  if (!nip || !nama) {
+    alert("Data tidak lengkap. Silakan login ulang.");
+    window.location.href = "index.html";
     return;
   }
 
-  fetch(URL, {
+  document.getElementById("nip").innerText = nip;
+  document.getElementById("nama").innerText = decodeURIComponent(nama);
+
+  localStorage.setItem("nipLogin", nip);
+
+  const now = new Date();
+  document.getElementById("tanggal").innerText = now.toLocaleDateString("id-ID");
+  updateJam();
+  setInterval(updateJam, 1000);
+
+  function updateJam() {
+    const now = new Date();
+    const jamStr = now.toLocaleTimeString("id-ID", { hour12: false });
+    document.getElementById("jam").innerText = jamStr;
+
+    const hour = now.getHours();
+    const jenis = (hour >= 5 && hour < 12) ? "Masuk" : "Pulang";
+    document.getElementById("jenis").value = jenis;
+  }
+
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(5);
+        const lon = pos.coords.longitude.toFixed(5);
+        document.getElementById("lokasi").innerText = `${lat}, ${lon}`;
+      },
+      () => {
+        document.getElementById("lokasi").innerText = "Tidak tersedia";
+      }
+    );
+  } else {
+    document.getElementById("lokasi").innerText = "Tidak didukung";
+  }
+};
+
+// Ambil foto dan simpan base64
+function ambilFoto() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.capture = "environment";
+
+  input.onchange = function () {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const base64 = e.target.result;
+      localStorage.setItem("fotoAbsen", base64);
+      document.getElementById("previewFoto").innerHTML =
+        `<img src="${base64}" style="width:100%; border-radius:10px;" />`;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  input.click();
+}
+
+// Kirim absensi
+document.getElementById("absenForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+
+  const nip = document.getElementById("nip").innerText;
+  const nama = document.getElementById("nama").innerText;
+  const tanggal = document.getElementById("tanggal").innerText;
+  const jam = document.getElementById("jam").innerText;
+  const jenis = document.getElementById("jenis").value;
+  const lokasi = document.getElementById("lokasi").innerText;
+  const fotoBase64 = localStorage.getItem("fotoAbsen");
+
+  if (!fotoBase64) {
+    alert("Derang foto mesti 😂😂");
+    return;
+  }
+
+  if (lokasi === "Tidak tersedia" || lokasi === "Tidak didukung") {
+    alert("Ampun Kesupen, GPS Lokasi di Aktifaken");
+    return;
+  }
+
+  document.getElementById("status").innerText = "Mengirim data...";
+  document.getElementById("overlay").style.display = "flex";
+
+  fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "kirimAbsen",
+      nip,
+      nama,
+      tanggal,
+      jam,
+      jenis,
+      lokasi,
+      foto: fotoBase64
+    })
   })
-    .then(res => res.text())
+    .then(res => res.json())
     .then(res => {
-      alert("✅ Absensi berhasil dikirim.");
-      loading.style.display = 'none';
-      window.location.reload();
+      if (res.status === "success") {
+        document.getElementById("status").innerText = "✅ Absensi berhasil dikirim.";
+        localStorage.removeItem("fotoAbsen");
+        document.getElementById("absenForm").reset();
+        document.getElementById("previewFoto").innerHTML = `<span>📸 Foto akan tampil di sini</span>`;
+        setTimeout(() => {
+          window.location.href = "home.html";
+        }, 1500);
+      } else {
+        document.getElementById("status").innerText = "❌ Gagal mengirim absensi.";
+        document.getElementById("overlay").style.display = "none";
+      }
     })
     .catch(err => {
-      console.error("❌ Gagal kirim:", err);
-      alert("❌ Terjadi kesalahan saat mengirim data.");
-      loading.style.display = 'none';
+      console.error(err);
+      document.getElementById("status").innerText = "❌ Terjadi kesalahan saat mengirim.";
+      document.getElementById("overlay").style.display = "none";
     });
-}
+});
