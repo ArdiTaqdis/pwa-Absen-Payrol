@@ -60,18 +60,16 @@ function ambilFoto() {
     const file = input.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      const base64 = e.target.result;
-      localStorage.setItem("fotoAbsen", base64);
-      document.getElementById("previewFoto").innerHTML =
-        `<img src="${base64}" style="width:100%; border-radius:10px;" />`;
-    };
-    reader.readAsDataURL(file);
+    // Validasi ukuran file sebelum dikompres
+    if (!validateSizeBeforeCompress(file)) return;
+
+    // Kompres dan simpan ke localStorage, lalu tampilkan preview
+    compressAndSaveImage(file, "previewFoto", "fotoAbsen");
   };
 
   input.click();
 }
+
 
 // Kirim absensi
 document.getElementById("absenForm").addEventListener("submit", function (e) {
