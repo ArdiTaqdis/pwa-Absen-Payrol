@@ -98,7 +98,7 @@ document.getElementById("absenForm").addEventListener("submit", function (e) {
   document.getElementById("status").innerText = "Mengirim data...";
   document.getElementById("overlay").style.display = "flex";
 
-  fetch("https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbxmWqn8n94JC9xXYe-Lh6l6Ra0dIEV85snEQWZ3z5zMy_lZSy0NqOxUHI4-pdkDKxkU/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
