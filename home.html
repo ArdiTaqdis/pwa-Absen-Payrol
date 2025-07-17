@@ -75,16 +75,18 @@
   </div>
 
   <script>
-    const nip = localStorage.getItem('nip');
-    const nama = localStorage.getItem('nama') || 'Anggota Tim';
+   const nip = localStorage.getItem('nip');
+  const nama = localStorage.getItem('nama') || 'Anggota Tim';
 
-    if (!nip) {
-      alert("Silakan login terlebih dahulu.");
-      window.location.href = 'index.html';
-    } else {
-      document.getElementById('idTeam').textContent = nip;
-      document.getElementById('namaTeam').textContent = nama;
-    }
+  // Validasi login dan format NIP
+  if (!nip || nip.length < 3 || !/^\d+$/.test(nip)) {
+    alert("ID Tim tidak valid. Silakan login ulang.");
+    window.location.href = 'index.html';
+  } else {
+    document.getElementById('idTeam').textContent = nip;
+    document.getElementById('namaTeam').textContent = nama;
+  }
+
 
     function logout() {
       localStorage.clear();
@@ -93,25 +95,24 @@
 
     
 
-    function goToForm() {
-      const btn = event.target;
-      btn.disabled = true;
-      const nip = localStorage.getItem('nip');
-      const nama = encodeURIComponent(localStorage.getItem('nama') || '');
-      if (!nip) {
-        alert("Silakan login terlebih dahulu.");
-        window.location.href = 'index.html';
-        return;
-      }
-      window.location.href = `form.html?nip=${nip}&nama=${nama}`;
-    }
+   function goToForm() {
+  const btn = event.target;
+  btn.disabled = true;
 
+  const nip = localStorage.getItem('nip');
+  const nama = encodeURIComponent(localStorage.getItem('nama') || '');
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log("✅ Service Worker registered"))
-        .catch(err => console.log("❌ SW failed:", err));
-    }
+  if (!nip) {
+    alert("Silakan login terlebih dahulu.");
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // 👉 Ganti URL ini dengan Web App URL kamu
+  const webAppUrl = "https://script.google.com/macros/s/AKfycby1URZ6mcWrl3pgh4vY06EvbIpS7HXQ43rgsJwWQHOHO42lgwc1se-ogFo7UcW6D7gB/exec";
+  window.location.href = `${webAppUrl}?nip=${nip}&nama=${nama}`;
+}
+
   </script>
 
 
