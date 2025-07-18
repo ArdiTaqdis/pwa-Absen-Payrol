@@ -22,7 +22,7 @@
       border-radius: 16px;
       box-shadow: 0 6px 16px rgba(0,0,0,0.15);
       width: 100%;
-      max-width: 300px; /* versi ramping */
+      max-width: 300px;
       text-align: center;
     }
 
@@ -34,7 +34,7 @@
 
     h2 {
       margin-bottom: 1.2rem;
-      color: #e65100;
+      color: #9b00f5;
       font-size: 1.3rem;
       letter-spacing: 0.5px;
     }
@@ -56,10 +56,35 @@
       border: none;
       cursor: pointer;
       transition: background 0.2s ease-in-out;
+      position: relative;
     }
 
-    button:hover {
-      background: #ef6c00;
+    button[disabled] {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    button .spinner {
+      border: 2px solid #fff;
+      border-top: 2px solid transparent;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: none;
+    }
+
+    button.loading .spinner {
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      0% { transform: translateY(-50%) rotate(0deg); }
+      100% { transform: translateY(-50%) rotate(360deg); }
     }
 
     .info {
@@ -73,7 +98,10 @@
     <img src="logo.png" alt="Logo SDS Snack" class="logo" />
     <h2>Login Tim SDS Snack</h2>
     <input type="text" id="nip" placeholder="ID Tim" />
-   <button onclick="login()">Masuk</button>
+    <button id="btnLogin" onclick="login()">
+      <span class="spinner"></span>
+      <span class="btn-text">Masuk</span>
+    </button>
     <p class="info">Pastikan NIP Anda terdaftar</p>
     <p class="info"> ♡⋆⋆SDS Snack⋆⋆♡ </p>
   </div>
@@ -83,19 +111,25 @@
 
   function login() {
     const nip = document.getElementById('nip').value.trim();
-    const nama = document.getElementById('nama').value.trim();
+    const btn = document.getElementById('btnLogin');
+    const btnText = btn.querySelector('.btn-text');
 
     if (!nip) {
       alert("ID Tim wajib diisi");
       return;
     }
 
+    // Start loading
+    btn.disabled = true;
+    btn.classList.add("loading");
+    btnText.textContent = "Memproses...";
+
     fetch(`${scriptURL}?action=cekNIP&nip=${nip}`)
       .then(res => res.json())
       .then(data => {
         if (data.status === "ok") {
           localStorage.setItem('nip', nip);
-          localStorage.setItem('nama', data.nama || nama);
+          localStorage.setItem('nama', data.nama || '');
           window.location.href = "home.html";
         } else {
           alert("❌ NIP tidak terdaftar di DataKaryawan");
@@ -104,6 +138,11 @@
       .catch(err => {
         console.error(err);
         alert("❌ Gagal menghubungi server");
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+        btnText.textContent = "Masuk";
       });
   }
 
