@@ -1,34 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Absen SDS Snack</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   <style>
-    body { font-family: sans-serif; padding: 16px; }
-    #reader { width: 280px; margin: auto; }
-    .container { max-width: 400px; margin: auto; }
-    button { padding: 10px 16px; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #e3f2fd;
+      margin: 0;
+      padding: 0;
+    }
+
+    .judul {
+      background: #0d47a1;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 4px solid #1976d2;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      margin-bottom: 15px;
+    }
+
+    .judul h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .container {
+      background: white;
+      max-width: 460px;
+      margin: auto;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .identitas {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    #reader {
+      width: 100%;
+      margin: 16px auto;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+    }
+
+    button[type="button"] {
+      background: #0288d1;
+    }
+
+    button[type="button"]:hover {
+      background: #0277bd;
+    }
+
+    button[type="submit"] {
+      background: #2e7d32;
+    }
+
+    button[type="submit"]:hover {
+      background: #1b5e20;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    #qrResult, #status {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.3s ease;
+    }
+
+    #overlay .spinner {
+      border: 6px solid #f3f3f3;
+      border-top: 6px solid #1976d2;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
+  <div class="judul">
+    <h1>ABSEN SDS SNACK</h1>
+  </div>
+
   <div class="container">
-    <h2>ABSEN SDS SNACK</h2>
-    <p><b>NIP:</b> <span id="nip">-</span></p>
-    <p><b>Nama:</b> <span id="nama">-</span></p>
-    <p><b>Tanggal:</b> <span id="tanggal">-</span></p>
-    <p><b>Jam:</b> <span id="jam">-</span></p>
-    <p><b>Jenis:</b> <span id="jenis">Pulang</span></p>
-    <p><b>Lokasi:</b> <span id="lokasi">Memuat lokasi...</span></p>
+    <div class="identitas">
+      <p><b>NIP:</b> <span id="nip">-</span></p>
+      <p><b>Nama:</b> <span id="nama">-</span></p>
+      <p><b>Tanggal:</b> <span id="tanggal">-</span></p>
+      <p><b>Jam:</b> <span id="jam">-</span></p>
+      <p><b>Jenis:</b> <span id="jenis">Pulang</span></p>
+      <p><b>Lokasi:</b> <span id="lokasi">Memuat lokasi...</span></p>
+    </div>
 
     <h3>Scan QR Lokasi Produksi</h3>
     <div id="reader"></div>
     <p>Hasil Scan: <b id="qrResult">Belum scan</b></p>
 
-    <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
+    <button type="submit" onclick="kirimAbsen()">✅ Kirim Absensi</button>
     <p id="status"></p>
   </div>
+
+  <div id="overlay"><div class="spinner"></div></div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
@@ -59,10 +173,15 @@
       document.getElementById("qrResult").textContent = decodedText;
       localStorage.setItem("qrCode", decodedText);
       qrScanner.clear();
+      document.getElementById("status").textContent = "";
     }
 
     const qrScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
     qrScanner.render(onScanSuccess);
+
+    function showLoading(show) {
+      document.getElementById("overlay").style.display = show ? "flex" : "none";
+    }
 
     function kirimAbsen() {
       const qrCode = localStorage.getItem("qrCode") || "";
@@ -81,15 +200,24 @@
         qrCode
       };
 
-      fetch("https://script.google.com/macros/s/AKfycbwUrPdvsMIydeLYDXD_jPpVTHZmZh5CmRa2Zlvqn-CZdX_aDEAGEr30_DUhbNpQTvYt/exec", {
+      showLoading(true);
+
+      fetch("https://script.google.com/macros/s/AKfycbyTitpVHK4UjUMH5KxnDAL4q-k4NEpiD8atYlU4AaapZGL9dTKRxnUZIiR5zhIEsvkF/exec", {
         method: "POST",
         body: new URLSearchParams(data)
       })
       .then(res => res.text())
       .then(res => {
-        document.getElementById("status").textContent = "✅ Absen berhasil!";
+        showLoading(false);
+        if (res.toLowerCase().includes("success") || res.includes("Berhasil")) {
+          document.getElementById("status").textContent = "✅ Absen berhasil!";
+          setTimeout(() => window.location.href = "home.html", 1000);
+        } else {
+          document.getElementById("status").textContent = "❌ Gagal: " + res;
+        }
       })
       .catch(err => {
+        showLoading(false);
         document.getElementById("status").textContent = "❌ Gagal mengirim absen.";
         console.error(err);
       });
