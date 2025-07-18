@@ -3,81 +3,119 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Beranda Tim SDS Snack</title>
+  <meta name="theme-color" content="#ff9800" />
+
+  <title>Dashboard - Tim SDS Snack</title>
+  <link rel="manifest" href="manifest.json">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 2rem;
+      background: #fdfdfd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
     }
     .container {
-      background: white;
-      max-width: 600px;
-      margin: auto;
+      background: #fff;
       padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
     }
-    h2 {
-      color: #ff9800;
+    .logo {
+      width: 80px;
+      height: 80px;
       margin-bottom: 1rem;
     }
-    p { margin: 0.5rem 0; }
-    .logout {
-      margin-top: 2rem;
-      background-color: #e53935;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
+    h2 {
+      margin-bottom: 0.2rem;
+      color: #333;
     }
+    .subtitle {
+      font-size: 0.95rem;
+      color: #888;
+      margin-bottom: 1.5rem;
+    }
+    button {
+      width: 100%;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-absen { background: #ff9800; color: white; }
+    .btn-rekap { background: #2196f3; color: white; }
+    .btn-gaji  { background: #4caf50; color: white; }
+    .btn-logout { background: #f44336; color: white; }
+    button:hover { opacity: 0.9; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Halo, <span id="nama">...</span></h2>
-    <p><strong>NIP:</strong> <span id="nip"></span></p>
-    <p><strong>Jabatan:</strong> <span id="jabatan"></span></p>
-    <p><strong>Tarif per Jam:</strong> <span id="tarif_jam"></span></p>
-    <p><strong>Tarif Lembur:</strong> <span id="tarif_lembur"></span></p>
-    <button class="logout" onclick="logout()">Keluar</button>
+    <img src="logo.png" alt="Logo SDS Snack" class="logo" />
+    <h2>SDS Snack</h2>
+    <div class="subtitle">Dashboard Tim SDS Snack</div>
+
+    <div>
+      <p><strong id="namaTeam">Nama Tim</strong><br>
+      <small>ID Tim: <span id="idTeam"></span></small></p>
+    </div>
+
+    <button class="btn-absen" onclick="goToForm()">📝 Absen Sekarang</button>
+    <button class="btn-rekap" onclick="location.href='rekap.html'">📅 Rekap Kehadiran</button>
+    <button class="btn-gaji" onclick="location.href='gaji.html'">💰 Lihat Gaji</button>
+    <button class="btn-logout" onclick="logout()">🔒 Logout</button>
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbybxqHrrkhclHrUmzq5EXnSDxM_ufarGGAHEDV1teDRxczbyvj7PEEl2evnrK08rGuu/exec";
+   const nip = localStorage.getItem('nip');
+  const nama = localStorage.getItem('nama') || 'Anggota Tim';
 
-    const nip = localStorage.getItem('nip');
-    if (!nip) {
-      alert("Silakan login dulu.");
-      window.location.href = "index.html";
-    }
+  // Validasi login dan format NIP
+  if (!nip || nip.length < 3 || !/^\d+$/.test(nip)) {
+    alert("ID Tim tidak valid. Silakan login ulang.");
+    window.location.href = 'index.html';
+  } else {
+    document.getElementById('idTeam').textContent = nip;
+    document.getElementById('namaTeam').textContent = nama;
+  }
 
-    fetch(`${scriptURL}?action=cekNIP&nip=${nip}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "ok") {
-          document.getElementById('nama').textContent = data.nama;
-          document.getElementById('nip').textContent = nip;
-          document.getElementById('jabatan').textContent = data.jabatan;
-          document.getElementById('tarif_jam').textContent = `Rp${parseInt(data.tarifPerJam).toLocaleString('id-ID')}`;
-          document.getElementById('tarif_lembur').textContent = `Rp${parseInt(data.tarifLembur).toLocaleString('id-ID')}`;
-        } else {
-          alert("Data tidak ditemukan.");
-          window.location.href = "index.html";
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Gagal mengambil data dari server.");
-      });
 
     function logout() {
       localStorage.clear();
-      window.location.href = "index.html";
+      window.location.href = 'index.html';
     }
+
+    
+
+   function goToForm() {
+  const btn = event.target;
+  btn.disabled = true;
+
+  const nip = localStorage.getItem('nip');
+  const nama = encodeURIComponent(localStorage.getItem('nama') || '');
+
+  if (!nip) {
+    alert("Silakan login terlebih dahulu.");
+    window.location.href = 'index.html';
+    return;
+  }
+
+  // 👉 Ganti URL ini dengan Web App URL kamu
+  const webAppUrl = "https://script.google.com/macros/s/AKfycbybxqHrrkhclHrUmzq5EXnSDxM_ufarGGAHEDV1teDRxczbyvj7PEEl2evnrK08rGuu/exec";
+  window.location.href = `${webAppUrl}?nip=${nip}&nama=${nama}`;
+}
+
   </script>
+
+
+
 </body>
 </html>
