@@ -3,119 +3,194 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="theme-color" content="#ff9800" />
-
-  <title>Dashboard - Tim SDS Snack</title>
+  <title>Home - SDS Snack</title>
+  <meta name="theme-color" content="#00c4a7">
   <link rel="manifest" href="manifest.json">
   <style>
+    :root {
+      --mint: #8067eb;
+      --pink: #cac1ff;
+      --choco: #7c6ca8;
+      --bg: #fefdfc;
+    }
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      background: #fdfdfd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
-    }
-    .logo {
-      width: 80px;
-      height: 80px;
-      margin-bottom: 1rem;
-    }
-    h2 {
-      margin-bottom: 0.2rem;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
       color: #333;
     }
-    .subtitle {
-      font-size: 0.95rem;
-      color: #888;
-      margin-bottom: 1.5rem;
+    .wave {
+      background: var(--mint);
+      padding: 2rem 1rem 4rem;
+      color: white;
+      border-bottom-left-radius: 40% 10%;
+      border-bottom-right-radius: 40% 10%;
+      text-align: center;
     }
-    button {
-      width: 100%;
-      padding: 1rem;
-      margin: 0.5rem 0;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+    .wave img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 10px;
+    }
+    .wave h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    .wave p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .container {
+      margin-top: -1rem;
+      padding: 2.5rem;
+    }
+
+    .grid-menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin: 1rem 0 2rem;
+    }
+
+    .menu-item {
+      background: var(--pink);
+      padding: 1.2rem;
+      border-radius: 16px;
+      text-align: center;
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
       transition: 0.2s;
+      cursor: pointer;
     }
-    .btn-absen { background: #ff9800; color: white; }
-    .btn-rekap { background: #2196f3; color: white; }
-    .btn-gaji  { background: #4caf50; color: white; }
-    .btn-logout { background: #f44336; color: white; }
-    button:hover { opacity: 0.9; }
+
+    .menu-item:hover {
+      transform: scale(1.03);
+      background: #ffb3c1;
+    }
+
+    .menu-item .icon {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: var(--choco);
+    }
+
+    .bottom-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .bottom-actions .menu-item {
+      background: #ffe0b2;
+      color: #5d4037;
+    }
+
+    .logout {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .logout button {
+      padding: 0.7rem 2rem;
+      background: #7f0beb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .logout button:hover {
+      background: #c62828;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <img src="logo.png" alt="Logo SDS Snack" class="logo" />
-    <h2>SDS Snack</h2>
-    <div class="subtitle">Dashboard Tim SDS Snack</div>
 
+  <div class="wave">
+    <img src="logo.png" alt="Logo SDS Snack" />
+    <h1>SDS Snack</h1>
+    <p id="namaTeam">Nama Tim</p>
+    <small>ID Tim: <span id="idTeam"></span></small>
+  </div>
+
+  <div class="container">
     <div>
-      <p><strong id="namaTeam">Nama Tim</strong><br>
-      <small>ID Tim: <span id="idTeam"></span></small></p>
+      <div class="section-title">Menu Utama</div>
+      <div class="grid-menu">
+        <div class="menu-item" onclick="goToForm()">
+          <div class="icon">📝</div>
+          <div>Absen</div>
+        </div>
+        <div class="menu-item" onclick="location.href='rekap.html'">
+          <div class="icon">📅</div>
+          <div>Rekap</div>
+        </div>
+        <div class="menu-item" onclick="location.href='gaji.html'">
+          <div class="icon">💰</div>
+          <div>Gaji</div>
+        </div>
+        <div class="menu-item" onclick="location.href='rincian.html'">
+          <div class="icon">📋</div>
+          <div>Rincian</div>
+        </div>
+      </div>
     </div>
 
-    <button class="btn-absen" onclick="goToForm()">📝 Absen Sekarang</button>
-    <button class="btn-rekap" onclick="location.href='rekap.html'">📅 Rekap Kehadiran</button>
-    <button class="btn-gaji" onclick="location.href='gaji.html'">💰 Lihat Gaji</button>
-    <button class="btn-logout" onclick="logout()">🔒 Logout</button>
+    <div>
+      <div class="section-title">Lainnya</div>
+      <div class="bottom-actions">
+        <div class="menu-item" onclick="location.href='kasir.html'">
+          <div class="icon">🛒</div>
+          <div>Kasir</div>
+        </div>
+        <div class="menu-item" onclick="location.href='pesanan.html'">
+          <div class="icon">📦</div>
+          <div>Pesanan</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="logout">
+      <button onclick="logout()">🔒 Logout</button>
+    </div>
   </div>
 
   <script>
-   const nip = localStorage.getItem('nip');
-  const nama = localStorage.getItem('nama') || 'Anggota Tim';
+    const nip = localStorage.getItem('nip');
+    const nama = localStorage.getItem('nama') || 'Anggota Tim';
 
-  // Validasi login dan format NIP
-  if (!nip || nip.length < 3 || !/^\d+$/.test(nip)) {
-    alert("ID Tim tidak valid. Silakan login ulang.");
-    window.location.href = 'index.html';
-  } else {
-    document.getElementById('idTeam').textContent = nip;
-    document.getElementById('namaTeam').textContent = nama;
-  }
-
+    if (!nip || nip.length < 3 || !/^\d+$/.test(nip)) {
+      alert("ID Tim tidak valid. Silakan login ulang.");
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('idTeam').textContent = nip;
+      document.getElementById('namaTeam').textContent = nama;
+    }
 
     function logout() {
       localStorage.clear();
       window.location.href = 'index.html';
     }
 
-    
-
-   function goToForm() {
+    function goToForm() {
       const btn = event.target;
       btn.disabled = true;
-
-      const nip = localStorage.getItem('nip');
       const nama = encodeURIComponent(localStorage.getItem('nama') || '');
-
-      if (!nip) {
-        alert("Silakan login terlebih dahulu.");
-        window.location.href = 'index.html';
-        return;
-      }
-
-      // Redirect ke form.html (bukan Google Script)
       window.location.href = `form.html?nip=${nip}&nama=${nama}`;
     }
-
-
   </script>
-
-
-
 </body>
 </html>

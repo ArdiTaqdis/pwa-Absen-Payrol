@@ -7,48 +7,79 @@
   <link rel="manifest" href="manifest.json" />
   <style>
     body {
-      font-family: Arial;
-      background: #f8f8f8;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom right, #8067eb, #cac1ff);
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
+
     .login-box {
       background: white;
       padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 350px;
-    }
-    h2 { text-align: center; margin-bottom: 1.5rem; }
-    input, button {
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.15);
       width: 100%;
-      padding: 0.8rem;
-      margin-bottom: 1rem;
-      border-radius: 5px;
-      border: 1px solid #ccc;
+      max-width: 300px; /* versi ramping */
+      text-align: center;
     }
+
+    .logo {
+      width: 70px;
+      height: auto;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      margin-bottom: 1.2rem;
+      color: #e65100;
+      font-size: 1.3rem;
+      letter-spacing: 0.5px;
+    }
+
+    input, button {
+      width: 90%;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      text-align: center;
+    }
+
     button {
-      background: #ff9800;
+      background: #9b00f5;
       color: white;
       font-weight: bold;
       border: none;
       cursor: pointer;
+      transition: background 0.2s ease-in-out;
+    }
+
+    button:hover {
+      background: #ef6c00;
+    }
+
+    .info {
+      font-size: 0.70rem;
+      color: #777;
     }
   </style>
 </head>
 <body>
   <div class="login-box">
+    <img src="logo.png" alt="Logo SDS Snack" class="logo" />
     <h2>Login Tim SDS Snack</h2>
     <input type="text" id="nip" placeholder="ID Tim" />
-    <input type="text" id="nama" placeholder="Nama Tim (opsional)" />
-    <button onclick="login()">Masuk</button>
+   <button onclick="login()">Masuk</button>
+    <p class="info">Pastikan NIP Anda terdaftar</p>
+    <p class="info"> ♡⋆⋆SDS Snack⋆⋆♡ </p>
   </div>
 
 <script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbxGNdx3BMFzPrdHrOdRdPkE0FGesvoTf2ISLbr5DEtE1-Ye3suIyCyDR5vGMF-6hhcu/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbz8DDijdFxlyBkFIVj8QQar1N36K30QKTybln8uD3GqnlbdWli7MYUZGugqe7-BsX-o/exec";
 
   function login() {
     const nip = document.getElementById('nip').value.trim();
