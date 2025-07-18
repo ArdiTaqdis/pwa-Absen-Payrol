@@ -1,72 +1,99 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Giat Patroli Security</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css" />
+  <title>Absen SDS Snack</title>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <style>
+    body { font-family: sans-serif; padding: 16px; }
+    #reader { width: 280px; margin: auto; }
+    .container { max-width: 400px; margin: auto; }
+    button { padding: 10px 16px; font-weight: bold; }
+  </style>
 </head>
 <body>
-  <!-- HEADER -->
-  <header class="judul">
-    <button type="button" onclick="window.location.href='home.html'">⬅️ Kembali</button>
-    <h1>Absen SDS Snack</h1>
-  </header>
-
   <div class="container">
-    <!-- IDENTITAS -->
-    <div class="identitas">
-      <div><strong>NIP:</strong> <span id="nip">-</span></div>
-      <div class="besar"><strong>Nama:</strong> <span id="nama">-</span></div>
-    </div>
+    <h2>ABSEN SDS SNACK</h2>
+    <p><b>NIP:</b> <span id="nip">-</span></p>
+    <p><b>Nama:</b> <span id="nama">-</span></p>
+    <p><b>Tanggal:</b> <span id="tanggal">-</span></p>
+    <p><b>Jam:</b> <span id="jam">-</span></p>
+    <p><b>Jenis:</b> <span id="jenis">Pulang</span></p>
+    <p><b>Lokasi:</b> <span id="lokasi">Memuat lokasi...</span></p>
 
-    <!-- WAKTU & LOKASI -->
-    <div class="info-waktu">
-      <div><strong>Tanggal:</strong> <span id="tanggal">-</span></div>
-      <div><strong>Jam:</strong> <span id="jam">-</span></div>
-      <div><strong>Jenis:</strong>
-        <input type="text" id="jenis" readonly style="border:none; background:transparent; font-weight:bold;" />
-      </div>
-      <div><strong>Lokasi:</strong> <span id="lokasi">-</span></div>
-    </div>
+    <h3>Scan QR Lokasi Produksi</h3>
+    <div id="reader"></div>
+    <p>Hasil Scan: <b id="qrResult">Belum scan</b></p>
 
-    <!-- QR SCANNER -->
-    <div class="qr-section">
-      <h3>Scan QR Lokasi Produksi</h3>
-      <div id="reader" style="width: 300px; margin: auto;"></div>
-      <p>Hasil Scan: <strong id="qrResult">Belum scan</strong></p>
-    </div>
-
-    <!-- FORM -->
-    <form id="absenForm">
-      <!-- Tombol Kirim -->
-      <button type="submit">Kirim Absensi</button>
-    </form>
-
-    <div id="status"></div>
+    <button onclick="kirimAbsen()">✅ Kirim Absensi</button>
+    <p id="status"></p>
   </div>
-
-  <!-- LOADING -->
-  <div id="overlay">
-    <div class="spinner"></div>
-  </div>
-
-  <!-- Script -->
-  <script src="utils.js"></script>
-  <script src="form.js"></script>
 
   <script>
-    // Inisialisasi QR Scanner
+    const params = new URLSearchParams(window.location.search);
+    const nip = params.get("nip") || "-";
+    const nama = params.get("nama") || "-";
+
+    document.getElementById("nip").textContent = nip;
+    document.getElementById("nama").textContent = nama;
+
+    const now = new Date();
+    document.getElementById("tanggal").textContent = now.toLocaleDateString("id-ID");
+    document.getElementById("jam").textContent = now.toLocaleTimeString("id-ID");
+    document.getElementById("jenis").textContent = now.getHours() < 12 ? "Masuk" : "Pulang";
+
+    navigator.geolocation.getCurrentPosition(pos => {
+      const { latitude, longitude } = pos.coords;
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById("lokasi").textContent = data.display_name;
+        })
+        .catch(() => {
+          document.getElementById("lokasi").textContent = "Tidak bisa membaca lokasi.";
+        });
+    });
+
     function onScanSuccess(decodedText) {
-      document.getElementById('qrResult').textContent = decodedText;
-      localStorage.setItem('qrCodeLokasi', decodedText);
+      document.getElementById("qrResult").textContent = decodedText;
+      localStorage.setItem("qrCode", decodedText);
       qrScanner.clear();
     }
 
     const qrScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
     qrScanner.render(onScanSuccess);
+
+    function kirimAbsen() {
+      const qrCode = localStorage.getItem("qrCode") || "";
+      if (!qrCode || qrCode !== "001-SDS Snack") {
+        alert("❌ QR Code tidak valid. Scan ulang.");
+        return;
+      }
+
+      const data = {
+        nip,
+        nama,
+        tanggal: document.getElementById("tanggal").textContent,
+        jam: document.getElementById("jam").textContent,
+        jenis: document.getElementById("jenis").textContent,
+        lokasi: document.getElementById("lokasi").textContent,
+        qrCode
+      };
+
+      fetch("https://script.google.com/macros/s/AKfycbwUrPdvsMIydeLYDXD_jPpVTHZmZh5CmRa2Zlvqn-CZdX_aDEAGEr30_DUhbNpQTvYt/exec", {
+        method: "POST",
+        body: new URLSearchParams(data)
+      })
+      .then(res => res.text())
+      .then(res => {
+        document.getElementById("status").textContent = "✅ Absen berhasil!";
+      })
+      .catch(err => {
+        document.getElementById("status").textContent = "❌ Gagal mengirim absen.";
+        console.error(err);
+      });
+    }
   </script>
 </body>
 </html>
