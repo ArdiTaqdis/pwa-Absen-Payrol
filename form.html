@@ -169,15 +169,36 @@
         });
     });
 
+    let scanner;
+
     function onScanSuccess(decodedText) {
       document.getElementById("qrResult").textContent = decodedText;
       localStorage.setItem("qrCode", decodedText);
-      qrScanner.clear();
-      document.getElementById("status").textContent = "";
+      scanner.stop().then(() => {
+        document.getElementById("status").textContent = "";
+      });
     }
 
-    const qrScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-    qrScanner.render(onScanSuccess);
+    Html5Qrcode.getCameras().then(devices => {
+      if (devices && devices.length) {
+        const backCam = devices.find(d => d.label.toLowerCase().includes('back')) || devices[0];
+        scanner = new Html5Qrcode("reader");
+        scanner.start(
+          backCam.id,
+          { fps: 10, qrbox: 250 },
+          onScanSuccess,
+          errorMsg => {}
+        ).catch(err => {
+          console.error("Gagal memulai kamera:", err);
+          document.getElementById("qrResult").textContent = "❌ Tidak dapat membuka kamera.";
+        });
+      } else {
+        document.getElementById("qrResult").textContent = "❌ Kamera tidak ditemukan.";
+      }
+    }).catch(err => {
+      console.error("Gagal mendapatkan kamera:", err);
+      document.getElementById("qrResult").textContent = "❌ Akses kamera ditolak.";
+    });
 
     function showLoading(show) {
       document.getElementById("overlay").style.display = show ? "flex" : "none";
