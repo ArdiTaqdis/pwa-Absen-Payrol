@@ -31,21 +31,7 @@ body {
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* .foto-preview {
-  width: 100%;
-  height: 100px;
-  background: #f0f0f0;
-  border: 2px dashed #aaa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  object-fit: cover;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  text-align: center;
-  font-size: 14px;
-  color: #666;
-} */
+
 
 .foto-preview img {
   width: 100%;
