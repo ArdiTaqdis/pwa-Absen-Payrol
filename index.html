@@ -47,38 +47,39 @@
     <button onclick="login()">Masuk</button>
   </div>
 
-  <script>
-    
+<script>
+  const scriptURL = "https://script.google.com/macros/s/AKfycbybxqHrrkhclHrUmzq5EXnSDxM_ufarGGAHEDV1teDRxczbyvj7PEEl2evnrK08rGuu/exec";
 
-    function login() {
-      const nip = document.getElementById('nip').value.trim();
-      const nama = document.getElementById('nama').value.trim();
+  function login() {
+    const nip = document.getElementById('nip').value.trim();
+    const nama = document.getElementById('nama').value.trim();
 
-      if (!nip) {
-        alert("ID Tim wajib diisi");
-        return;
-      }
-
-      fetch(`${scriptURL}?action=cekNIP&nip=${nip}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.status === "ok") {
-            localStorage.setItem('nip', nip);
-            localStorage.setItem('nama', data.nama || nama);
-            window.location.href = "home.html";
-          } else {
-            alert("❌ NIP tidak terdaftar di DataKaryawan");
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert("❌ Gagal menghubungi server");
-        });
+    if (!nip) {
+      alert("ID Tim wajib diisi");
+      return;
     }
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
-  </script>
+    fetch(`${scriptURL}?action=cekNIP&nip=${nip}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "ok") {
+          localStorage.setItem('nip', nip);
+          localStorage.setItem('nama', data.nama || nama);
+          window.location.href = "home.html";
+        } else {
+          alert("❌ NIP tidak terdaftar di DataKaryawan");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert("❌ Gagal menghubungi server");
+      });
+  }
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+</script>
+
 </body>
 </html>
