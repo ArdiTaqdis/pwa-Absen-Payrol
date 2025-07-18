@@ -1,8 +1,35 @@
+// ==================== UTILITAS ====================
 function getQueryParam(key) {
   const params = new URLSearchParams(window.location.search);
   return params.get(key);
 }
 
+function showToast(message, type = "info") {
+  const toast = document.createElement("div");
+  toast.innerText = message;
+  toast.style.position = "fixed";
+  toast.style.bottom = "20px";
+  toast.style.left = "50%";
+  toast.style.transform = "translateX(-50%)";
+  toast.style.background = type === "error" ? "#f44336" : type === "success" ? "#4caf50" : "#333";
+  toast.style.color = "#fff";
+  toast.style.padding = "12px 20px";
+  toast.style.borderRadius = "6px";
+  toast.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+  toast.style.zIndex = "9999";
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2500);
+}
+
+function setLoading(isLoading, text = "") {
+  const overlay = document.getElementById("overlay");
+  const status = document.getElementById("status");
+  overlay.style.display = isLoading ? "flex" : "none";
+  status.innerText = text;
+}
+
+
+// ==================== LOAD DATA ====================
 window.onload = function () {
   const nip = getQueryParam("nip");
   const nama = getQueryParam("nama");
@@ -15,24 +42,25 @@ window.onload = function () {
 
   document.getElementById("nip").innerText = nip;
   document.getElementById("nama").innerText = decodeURIComponent(nama);
-
   localStorage.setItem("nipLogin", nip);
 
+  // Set tanggal
   const now = new Date();
   document.getElementById("tanggal").innerText = now.toLocaleDateString("id-ID");
-  updateJam();
-  setInterval(updateJam, 1000);
 
+  // Set jam dan jenis absen
   function updateJam() {
     const now = new Date();
     const jamStr = now.toLocaleTimeString("id-ID", { hour12: false });
     document.getElementById("jam").innerText = jamStr;
-
     const hour = now.getHours();
     const jenis = (hour >= 5 && hour < 12) ? "Masuk" : "Pulang";
     document.getElementById("jenis").value = jenis;
   }
+  updateJam();
+  setInterval(updateJam, 1000);
 
+  // Ambil lokasi
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -41,27 +69,34 @@ window.onload = function () {
         localStorage.setItem("koordinat", `${lat},${lon}`);
 
         fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
-          .then(response => response.json())
+          .then(res => res.json())
           .then(data => {
-            const alamat = data.display_name || `${lat}, ${lon}`;
-            document.getElementById("lokasi").innerText = alamat;
+            document.getElementById("lokasi").innerText = data.display_name || `${lat}, ${lon}`;
           })
           .catch(() => {
             document.getElementById("lokasi").innerText = `${lat}, ${lon}`;
           });
       },
-      () => {
-        document.getElementById("lokasi").innerText = "Tidak tersedia";
-      }
+      () => document.getElementById("lokasi").innerText = "Tidak tersedia"
     );
   } else {
     document.getElementById("lokasi").innerText = "Tidak didukung";
   }
 };
 
-// Kirim absensi
+
+// ==================== KIRIM ABSEN ====================
 document.getElementById("absenForm").addEventListener("submit", function (e) {
   e.preventDefault();
+  setLoading(true, "🚀 Mengirim absensi...");
+
+  const qrCode = document.getElementById("qrResult").textContent.trim();
+  if (qrCode !== "001-SDS Snack") {
+    setLoading(false);
+    showToast("❌ QR Code tidak valid! Silakan scan QR yang benar.", "error");
+    document.getElementById("qrResult").textContent = "Belum scan";
+    return;
+  }
 
   const nip = document.getElementById("nip").innerText;
   const nama = document.getElementById("nama").innerText;
@@ -69,22 +104,8 @@ document.getElementById("absenForm").addEventListener("submit", function (e) {
   const jam = document.getElementById("jam").innerText;
   const jenis = document.getElementById("jenis").value;
   const lokasi = document.getElementById("lokasi").innerText;
-  const qrCode = localStorage.getItem("qrCodeLokasi");
 
-  if (!qrCode || qrCode === "Belum scan") {
-    alert("QR Code belum discan!");
-    return;
-  }
-
-  if (lokasi === "Tidak tersedia" || lokasi === "Tidak didukung") {
-    alert("Ampun Kesupen, GPS Lokasi di Aktifaken");
-    return;
-  }
-
-  document.getElementById("status").innerText = "Mengirim data...";
-  document.getElementById("overlay").style.display = "flex";
-
-  fetch("https://script.google.com/macros/s/AKfycbwWMfPtJdx2ki5bpA1-wZuy6yxEbffnsIi4tWb7UFzQSQw1IS-OYC8NVP8Vwt5sNnN2/exec", {
+  fetch("https://script.google.com/macros/s/AKfycby1URZ6mcWrl3pgh4vY06EvbIpS7HXQ43rgsJwWQHOHO42lgwc1se-ogFo7UcW6D7gB/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -98,23 +119,24 @@ document.getElementById("absenForm").addEventListener("submit", function (e) {
       qrCode
     })
   })
-    .then(res => res.json())
-    .then(res => {
-      if (res.status === "success") {
-        document.getElementById("status").innerText = "✅ Absensi berhasil dikirim.";
-        localStorage.removeItem("qrCodeLokasi");
-        document.getElementById("qrResult").textContent = "Belum scan";
-        setTimeout(() => {
-          window.location.href = "home.html";
-        }, 1500);
-      } else {
-        document.getElementById("status").innerText = "❌ Gagal mengirim absensi.";
-        document.getElementById("overlay").style.display = "none";
-      }
-    })
-    .catch(err => {
-      console.error(err);
-      document.getElementById("status").innerText = "❌ Terjadi kesalahan saat mengirim.";
-      document.getElementById("overlay").style.display = "none";
-    });
+  .then(res => res.json())
+  .then(res => {
+    if (res.status === "success") {
+      setLoading(true, "✅ Absensi berhasil dikirim.");
+      showToast("✅ Absensi berhasil!", "success");
+      document.getElementById("absenForm").reset();
+      document.getElementById("qrResult").textContent = "Belum scan";
+      setTimeout(() => {
+        window.location.href = "home.html";
+      }, 1500);
+    } else {
+      setLoading(false);
+      showToast("❌ Gagal mengirim absensi.", "error");
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    setLoading(false);
+    showToast("❌ Terjadi kesalahan jaringan.", "error");
+  });
 });
