@@ -2,82 +2,71 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Beranda Tim SDS Snack</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
-      margin: 0;
-      padding: 2rem;
-    }
-    .container {
-      background: white;
-      max-width: 600px;
-      margin: auto;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      color: #ff9800;
-      margin-bottom: 1rem;
-    }
-    p { margin: 0.5rem 0; }
-    .logout {
-      margin-top: 2rem;
-      background-color: #e53935;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giat Patroli Security</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
+  <!-- HEADER -->
+  <header class="judul">
+    <button type="button" onclick="window.location.href='home.html'">⬅️ Kembali</button>
+    <h1>Absen SDS Snack</h1>
+  </header>
+
   <div class="container">
-    <h2>Halo, <span id="nama">...</span></h2>
-    <p><strong>NIP:</strong> <span id="nip"></span></p>
-    <p><strong>Jabatan:</strong> <span id="jabatan"></span></p>
-    <p><strong>Tarif per Jam:</strong> <span id="tarif_jam"></span></p>
-    <p><strong>Tarif Lembur:</strong> <span id="tarif_lembur"></span></p>
-    <button class="logout" onclick="logout()">Keluar</button>
+    <!-- IDENTITAS -->
+    <div class="identitas">
+      <div><strong>NIP:</strong> <span id="nip">-</span></div>
+      <div class="besar"><strong>Nama:</strong> <span id="nama">-</span></div>
+    </div>
+
+    <!-- WAKTU & LOKASI -->
+    <div class="info-waktu">
+      <div><strong>Tanggal:</strong> <span id="tanggal">-</span></div>
+      <div><strong>Jam:</strong> <span id="jam">-</span></div>
+      <div><strong>Jenis:</strong>
+        <input type="text" id="jenis" readonly style="border:none; background:transparent; font-weight:bold;" />
+      </div>
+      <div><strong>Lokasi:</strong> <span id="lokasi">-</span></div>
+    </div>
+
+    <!-- QR SCANNER -->
+    <div class="qr-section">
+      <h3>Scan QR Lokasi Produksi</h3>
+      <div id="reader" style="width: 300px; margin: auto;"></div>
+      <p>Hasil Scan: <strong id="qrResult">Belum scan</strong></p>
+    </div>
+
+    <!-- FORM -->
+    <form id="absenForm">
+      <!-- Tombol Kirim -->
+      <button type="submit">Kirim Absensi</button>
+    </form>
+
+    <div id="status"></div>
   </div>
 
+  <!-- LOADING -->
+  <div id="overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Script -->
+  <script src="utils.js"></script>
+  <script src="form.js"></script>
+
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbybxqHrrkhclHrUmzq5EXnSDxM_ufarGGAHEDV1teDRxczbyvj7PEEl2evnrK08rGuu/exec";
-
-    const nip = localStorage.getItem('nip');
-    if (!nip) {
-      alert("Silakan login dulu.");
-      window.location.href = "index.html";
+    // Inisialisasi QR Scanner
+    function onScanSuccess(decodedText) {
+      document.getElementById('qrResult').textContent = decodedText;
+      localStorage.setItem('qrCodeLokasi', decodedText);
+      qrScanner.clear();
     }
 
-    fetch(`${scriptURL}?action=cekNIP&nip=${nip}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "ok") {
-          document.getElementById('nama').textContent = data.nama;
-          document.getElementById('nip').textContent = nip;
-          document.getElementById('jabatan').textContent = data.jabatan;
-          document.getElementById('tarif_jam').textContent = `Rp${parseInt(data.tarifPerJam).toLocaleString('id-ID')}`;
-          document.getElementById('tarif_lembur').textContent = `Rp${parseInt(data.tarifLembur).toLocaleString('id-ID')}`;
-        } else {
-          alert("Data tidak ditemukan.");
-          window.location.href = "index.html";
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Gagal mengambil data dari server.");
-      });
-
-    function logout() {
-      localStorage.clear();
-      window.location.href = "index.html";
-    }
+    const qrScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    qrScanner.render(onScanSuccess);
   </script>
 </body>
 </html>

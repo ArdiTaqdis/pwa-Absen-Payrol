@@ -33,21 +33,34 @@ window.onload = function () {
     document.getElementById("jenis").value = jenis;
   }
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude.toFixed(5);
-        const lon = pos.coords.longitude.toFixed(5);
-        document.getElementById("lokasi").innerText = `${lat}, ${lon}`;
-      },
-      () => {
-        document.getElementById("lokasi").innerText = "Tidak tersedia";
-      }
-    );
-  } else {
-    document.getElementById("lokasi").innerText = "Tidak didukung";
-  }
-};
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude.toFixed(5);
+      const lon = pos.coords.longitude.toFixed(5);
+
+      // Simpan ke koordinat lokal (jika diperlukan)
+      localStorage.setItem("koordinat", `${lat},${lon}`);
+
+      // Panggil OpenStreetMap untuk reverse geocoding
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+        .then(response => response.json())
+        .then(data => {
+          const alamat = data.display_name || `${lat}, ${lon}`;
+          document.getElementById("lokasi").innerText = alamat;
+        })
+        .catch(() => {
+          document.getElementById("lokasi").innerText = `${lat}, ${lon}`;
+        });
+    },
+    () => {
+      document.getElementById("lokasi").innerText = "Tidak tersedia";
+    }
+  );
+} else {
+  document.getElementById("lokasi").innerText = "Tidak didukung";
+}
+
 
 // Ambil foto dan simpan base64
 function ambilFoto() {
