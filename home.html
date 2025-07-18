@@ -96,22 +96,22 @@
     
 
    function goToForm() {
-  const btn = event.target;
-  btn.disabled = true;
+      const btn = event.target;
+      btn.disabled = true;
 
-  const nip = localStorage.getItem('nip');
-  const nama = encodeURIComponent(localStorage.getItem('nama') || '');
+      const nip = localStorage.getItem('nip');
+      const nama = encodeURIComponent(localStorage.getItem('nama') || '');
 
-  if (!nip) {
-    alert("Silakan login terlebih dahulu.");
-    window.location.href = 'index.html';
-    return;
-  }
+      if (!nip) {
+        alert("Silakan login terlebih dahulu.");
+        window.location.href = 'index.html';
+        return;
+      }
 
-  // 👉 Ganti URL ini dengan Web App URL kamu
-  const webAppUrl = "https://script.google.com/macros/s/AKfycbybxqHrrkhclHrUmzq5EXnSDxM_ufarGGAHEDV1teDRxczbyvj7PEEl2evnrK08rGuu/exec";
-  window.location.href = `${webAppUrl}?nip=${nip}&nama=${nama}`;
-}
+      // Redirect ke form.html (bukan Google Script)
+      window.location.href = `form.html?nip=${nip}&nama=${nama}`;
+    }
+
 
   </script>
 

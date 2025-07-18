@@ -33,56 +33,31 @@ window.onload = function () {
     document.getElementById("jenis").value = jenis;
   }
 
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(
-    (pos) => {
-      const lat = pos.coords.latitude.toFixed(5);
-      const lon = pos.coords.longitude.toFixed(5);
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(5);
+        const lon = pos.coords.longitude.toFixed(5);
+        localStorage.setItem("koordinat", `${lat},${lon}`);
 
-      // Simpan ke koordinat lokal (jika diperlukan)
-      localStorage.setItem("koordinat", `${lat},${lon}`);
-
-      // Panggil OpenStreetMap untuk reverse geocoding
-      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
-        .then(response => response.json())
-        .then(data => {
-          const alamat = data.display_name || `${lat}, ${lon}`;
-          document.getElementById("lokasi").innerText = alamat;
-        })
-        .catch(() => {
-          document.getElementById("lokasi").innerText = `${lat}, ${lon}`;
-        });
-    },
-    () => {
-      document.getElementById("lokasi").innerText = "Tidak tersedia";
-    }
-  );
-} else {
-  document.getElementById("lokasi").innerText = "Tidak didukung";
-}
-
-
-// Ambil foto dan simpan base64
-function ambilFoto() {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-  input.capture = "environment";
-
-  input.onchange = function () {
-    const file = input.files[0];
-    if (!file) return;
-
-    // Validasi ukuran file sebelum dikompres
-    if (!validateSizeBeforeCompress(file)) return;
-
-    // Kompres dan simpan ke localStorage, lalu tampilkan preview
-    compressAndSaveImage(file, "previewFoto", "fotoAbsen");
-  };
-
-  input.click();
-}
-
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+          .then(response => response.json())
+          .then(data => {
+            const alamat = data.display_name || `${lat}, ${lon}`;
+            document.getElementById("lokasi").innerText = alamat;
+          })
+          .catch(() => {
+            document.getElementById("lokasi").innerText = `${lat}, ${lon}`;
+          });
+      },
+      () => {
+        document.getElementById("lokasi").innerText = "Tidak tersedia";
+      }
+    );
+  } else {
+    document.getElementById("lokasi").innerText = "Tidak didukung";
+  }
+};
 
 // Kirim absensi
 document.getElementById("absenForm").addEventListener("submit", function (e) {
@@ -94,10 +69,10 @@ document.getElementById("absenForm").addEventListener("submit", function (e) {
   const jam = document.getElementById("jam").innerText;
   const jenis = document.getElementById("jenis").value;
   const lokasi = document.getElementById("lokasi").innerText;
-  const fotoBase64 = localStorage.getItem("fotoAbsen");
+  const qrCode = localStorage.getItem("qrCodeLokasi");
 
-  if (!fotoBase64) {
-    alert("Derang foto mesti 😂😂");
+  if (!qrCode || qrCode === "Belum scan") {
+    alert("QR Code belum discan!");
     return;
   }
 
@@ -109,7 +84,7 @@ document.getElementById("absenForm").addEventListener("submit", function (e) {
   document.getElementById("status").innerText = "Mengirim data...";
   document.getElementById("overlay").style.display = "flex";
 
-  fetch("https://script.google.com/macros/s/AKfycby1URZ6mcWrl3pgh4vY06EvbIpS7HXQ43rgsJwWQHOHO42lgwc1se-ogFo7UcW6D7gB/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbwWMfPtJdx2ki5bpA1-wZuy6yxEbffnsIi4tWb7UFzQSQw1IS-OYC8NVP8Vwt5sNnN2/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -120,16 +95,15 @@ document.getElementById("absenForm").addEventListener("submit", function (e) {
       jam,
       jenis,
       lokasi,
-      foto: fotoBase64
+      qrCode
     })
   })
     .then(res => res.json())
     .then(res => {
       if (res.status === "success") {
         document.getElementById("status").innerText = "✅ Absensi berhasil dikirim.";
-        localStorage.removeItem("fotoAbsen");
-        document.getElementById("absenForm").reset();
-        document.getElementById("previewFoto").innerHTML = `<span>📸 Foto akan tampil di sini</span>`;
+        localStorage.removeItem("qrCodeLokasi");
+        document.getElementById("qrResult").textContent = "Belum scan";
         setTimeout(() => {
           window.location.href = "home.html";
         }, 1500);
