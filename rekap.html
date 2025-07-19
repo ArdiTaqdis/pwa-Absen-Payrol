@@ -128,6 +128,7 @@
   <script>
     const nip = localStorage.getItem('nip');
     const nama = localStorage.getItem('nama') || "Tim SDS Snack";
+    console.log("📌 NIP dari localStorage:", nip); // ← di sini
     let allData = [];
 
     if (!nip) {
@@ -152,6 +153,7 @@
       fetch(`https://script.google.com/macros/s/AKfycbweuWuU28N3mexnMxzNkayXGQ1ZD_x75n1U2IfCGQ7eztKej2Ag4O9NuVCjcIhV6EHC/exec?action=rekap&nip=${nip}`)
         .then(res => res.json())
         .then(data => {
+          console.log("✅ Data hasil fetch:", data);
           document.getElementById("loading").style.display = "none";
           allData = Array.isArray(data) ? data : [];
           filterBulan();
