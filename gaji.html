@@ -12,7 +12,7 @@
       background-color: #f4f4f4;
     }
     .container {
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
       background: #fff;
       padding: 2rem;
@@ -21,23 +21,30 @@
     }
     h2 {
       text-align: center;
+      margin-bottom: 1rem;
+    }
+    .info, .periode-box {
       margin-bottom: 1.5rem;
     }
-    .info {
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    .gaji-box {
-      background-color: #e6f7ff;
-      padding: 1.5rem;
+    .periode-box {
+      background-color: #f1f8ff;
+      padding: 1rem;
       border-radius: 10px;
+      border-left: 5px solid #2196f3;
     }
-    .gaji-box p {
-      margin: 0.6rem 0;
+    .periode-box p {
+      margin: 0.4rem 0;
     }
     .label {
       font-weight: bold;
+    }
+    .total-gaji {
+      font-size: 1.2rem;
+      background: #e8f5e9;
+      padding: 1rem;
+      border-radius: 10px;
+      border-left: 5px solid #4caf50;
+      margin-top: 2rem;
     }
     .back {
       margin-bottom: 1.5rem;
@@ -62,59 +69,80 @@
 
     <div id="loading">🔄 Memuat data gaji...</div>
 
-    <div class="gaji-box" id="gajiBox" style="display:none;">
-      <p><span class="label">Total Jam Kerja:</span> <span id="jamKerja"></span> jam</p>
-      <p><span class="label">Total Lembur:</span> <span id="lembur"></span> jam</p>
-      <p><span class="label">Gaji Pokok:</span> Rp <span id="gajiPokok"></span></p>
-      <p><span class="label">Gaji Lembur:</span> Rp <span id="gajiLembur"></span></p>
-      <hr>
-      <p><span class="label">Total Gaji:</span> <strong>Rp <span id="totalGaji"></span></strong></p>
+    <div id="gajiBox" style="display:none;">
+      <div class="periode-box">
+        <h4>Periode 1 – 15</h4>
+        <p><span class="label">Jam Kerja:</span> <span id="jam1"></span> jam</p>
+        <p><span class="label">Lembur:</span> <span id="lembur1"></span> jam</p>
+        <p><span class="label">Gaji Pokok:</span> Rp <span id="pokok1"></span></p>
+        <p><span class="label">Gaji Lembur:</span> Rp <span id="lemburGaji1"></span></p>
+        <p><span class="label">Subtotal:</span> Rp <span id="subtotal1"></span></p>
+      </div>
+
+      <div class="periode-box">
+        <h4>Periode 16 – 31</h4>
+        <p><span class="label">Jam Kerja:</span> <span id="jam2"></span> jam</p>
+        <p><span class="label">Lembur:</span> <span id="lembur2"></span> jam</p>
+        <p><span class="label">Gaji Pokok:</span> Rp <span id="pokok2"></span></p>
+        <p><span class="label">Gaji Lembur:</span> Rp <span id="lemburGaji2"></span></p>
+        <p><span class="label">Subtotal:</span> Rp <span id="subtotal2"></span></p>
+      </div>
+
+      <div class="total-gaji">
+        <p><span class="label">Total Gaji Bulan Ini:</span> <strong>Rp <span id="totalGaji"></span></strong></p>
+      </div>
     </div>
   </div>
 
   <script>
-  const nip = localStorage.getItem('nip');
-  const nama = localStorage.getItem('nama') || "Tim SDS Snack";
-  const URL = "https://script.google.com/macros/s/AKfycbz9Xaaaej7zMUfM2rqCVW5TjlNoQFk9hUocbYpYgZHcxLYh8VSH1yke7SPahQcbfpUZ/exec";
+    const nip = localStorage.getItem('nip');
+    const nama = localStorage.getItem('nama') || "Tim SDS Snack";
 
-  if (!nip) {
-    alert("Silakan login terlebih dahulu.");
-    window.location.href = "index.html";
-  } else {
-    document.getElementById("idTeam").textContent = nip;
-    document.getElementById("namaTeam").textContent = nama;
+    if (!nip) {
+      alert("Silakan login terlebih dahulu.");
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("idTeam").textContent = nip;
+      document.getElementById("namaTeam").textContent = nama;
 
-    fetch(`${URL}?action=gaji&nip=${nip}`)
-      .then(res => res.json())
-      .then(data => {
-        if (!data || !data.nama) {
-          document.getElementById("gajiBox").innerHTML = "<p>Data gaji belum tersedia.</p>";
+      const url = "https://script.google.com/macros/s/AKfycbzNA3xNWdksfSUJQIRKKR5o_ChL61WxESMf8Jii6s0B0nOyAXG9xBWBt-t_FJTauvxL/exec";
+      fetch(`${url}?action=gaji&nip=${nip}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data || !data.periode1) throw new Error("Data tidak ditemukan");
+
+          // Periode 1
+          document.getElementById('jam1').textContent = data.periode1.jamNormal;
+          document.getElementById('lembur1').textContent = data.periode1.lembur;
+          document.getElementById('pokok1').textContent = formatRupiah(data.periode1.gajiPokok);
+          document.getElementById('lemburGaji1').textContent = formatRupiah(data.periode1.gajiLembur);
+          document.getElementById('subtotal1').textContent = formatRupiah(data.periode1.subtotal);
+
+          // Periode 2
+          document.getElementById('jam2').textContent = data.periode2.jamNormal;
+          document.getElementById('lembur2').textContent = data.periode2.lembur;
+          document.getElementById('pokok2').textContent = formatRupiah(data.periode2.gajiPokok);
+          document.getElementById('lemburGaji2').textContent = formatRupiah(data.periode2.gajiLembur);
+          document.getElementById('subtotal2').textContent = formatRupiah(data.periode2.subtotal);
+
+          // Total
+          document.getElementById('totalGaji').textContent = formatRupiah(data.totalGaji);
+          document.getElementById("loading").style.display = "none";
           document.getElementById("gajiBox").style.display = "block";
-          return;
-        }
+        })
+        .catch(err => {
+          console.error("Gagal ambil data:", err);
+          alert("Gagal mengambil data gaji.");
+        });
+    }
 
-        document.getElementById('jamKerja').textContent = data.jamKerja;
-        document.getElementById('lembur').textContent = data.lembur;
-        document.getElementById('gajiPokok').textContent = formatRupiah(data.gajiPokok);
-        document.getElementById('gajiLembur').textContent = formatRupiah(data.gajiLembur);
-        document.getElementById('totalGaji').textContent = formatRupiah(data.totalGaji);
-        document.getElementById("gajiBox").style.display = "block";
-        document.getElementById("loading").style.display = "none";
-      })
-      .catch(err => {
-        console.error("Gagal ambil data:", err);
-        alert("Gagal mengambil data gaji.");
-      });
-  }
+    function formatRupiah(angka) {
+      return new Intl.NumberFormat('id-ID').format(angka);
+    }
 
-  function formatRupiah(angka) {
-    return new Intl.NumberFormat('id-ID').format(angka);
-  }
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-  }
-</script>
-  
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
 </body>
 </html>
