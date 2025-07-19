@@ -75,6 +75,7 @@
   <script>
   const nip = localStorage.getItem('nip');
   const nama = localStorage.getItem('nama') || "Tim SDS Snack";
+  const URL = "https://script.google.com/macros/s/AKfycbz9Xaaaej7zMUfM2rqCVW5TjlNoQFk9hUocbYpYgZHcxLYh8VSH1yke7SPahQcbfpUZ/exec";
 
   if (!nip) {
     alert("Silakan login terlebih dahulu.");
@@ -83,7 +84,7 @@
     document.getElementById("idTeam").textContent = nip;
     document.getElementById("namaTeam").textContent = nama;
 
-    fetch(`https://script.google.com/macros/s/AKfycbxs68EGIiUydP_JciFlaEqDL45E3JkCtYJor02I_84s2f9Ojo0F6Pict1hDm0z8n_nb/exec?action=gaji&nip=${nip}`)
+    fetch(`${URL}?action=gaji&nip=${nip}`)
       .then(res => res.json())
       .then(data => {
         if (!data || !data.nama) {
