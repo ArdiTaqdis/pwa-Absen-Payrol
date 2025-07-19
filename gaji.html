@@ -115,14 +115,14 @@
           const p2 = data.periode2;
 
           // Periode 1
-          document.getElementById('jamNormal1').textContent = p1.jamNormal;
+          document.getElementById('jamNormal1').textContent = p1.jamKerja;
           document.getElementById('lembur1').textContent = p1.lembur;
           document.getElementById('gajiPokok1').textContent = formatRupiah(p1.gajiPokok);
           document.getElementById('gajiLembur1').textContent = formatRupiah(p1.gajiLembur);
           document.getElementById('subtotal1').textContent = formatRupiah(p1.subtotal);
 
           // Periode 2
-          document.getElementById('jamNormal2').textContent = p2.jamNormal;
+          document.getElementById('jamNormal2').textContent = p2.jamKerja;
           document.getElementById('lembur2').textContent = p2.lembur;
           document.getElementById('gajiPokok2').textContent = formatRupiah(p2.gajiPokok);
           document.getElementById('gajiLembur2').textContent = formatRupiah(p2.gajiLembur);
@@ -134,6 +134,7 @@
           document.getElementById("loading").style.display = "none";
           document.getElementById("gajiBox").style.display = "block";
         })
+
         .catch(err => {
           console.error("Gagal ambil data:", err);
           alert("Gagal mengambil data gaji.");
