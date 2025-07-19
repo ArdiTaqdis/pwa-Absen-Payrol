@@ -157,7 +157,7 @@
 
       document.getElementById("bulan").value = (new Date().getMonth() + 1).toString();
 
-      fetch(`https://script.google.com/macros/s/YOUR_WEBAPP_ID/exec?action=rekap&nip=${nip}`)
+      fetch(`https://script.google.com/macros/s/AKfycbwrU6tMqwFnWe4zhsH8CpzMEBWib_PVdcx0eGY52P0e_HQZnXq_xsAiyH69tSTG8Yco/exec?action=rekap&nip=${nip}`)
         .then(res => res.json())
         .then(data => {
           console.log("✅ Data hasil fetch:", data);
