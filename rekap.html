@@ -6,7 +6,6 @@
   <meta name="theme-color" content="#8067eb">
   <title>Rekap Kehadiran - Tim SDS Snack</title>
   <link rel="manifest" href="manifest.json">
-  <!-- Google Font Inter -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -21,7 +20,6 @@
       background: #fff;
       padding: 1.5rem;
       border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
       box-sizing: border-box;
     }
     h2 {
@@ -57,17 +55,17 @@
     }
     table {
       width: 100%;
-      min-width: 700px;
+      min-width: 900px;
       border-collapse: collapse;
       font-size: 13px;
     }
     th, td {
       padding: 0.5rem;
-      text-align: left;
+      text-align: center;
       border-bottom: 1px solid #ddd;
     }
     th {
-      background-color: #ff9800;
+      background-color: #8067eb;
       color: white;
       font-weight: 600;
     }
@@ -77,9 +75,15 @@
       font-size: 13px;
     }
 
+
+    .lembur-row {
+      background-color: #f3e5f5 !important; /* ungu pastel */
+    }
+
+
     @media (max-width: 768px) {
       table {
-        min-width: 650px;
+        min-width: 900px;
       }
     }
   </style>
@@ -87,26 +91,13 @@
 <body>
   <div class="container">
     <a href="home.html" class="back">← Kembali ke Dashboard</a>
-    <h2>Riwayat Kehadiran Anda</h2>
+    <h2>Rekap Harian Kehadiran</h2>
     <p><strong>Nama Tim:</strong> <span id="namaTeam"></span><br>
        <strong>ID Tim:</strong> <span id="idTeam"></span></p>
 
     <div class="filters">
       <label for="bulan">Bulan:</label>
-      <select id="bulan">
-        <option value="1">Januari</option>
-        <option value="2">Februari</option>
-        <option value="3">Maret</option>
-        <option value="4">April</option>
-        <option value="5">Mei</option>
-        <option value="6">Juni</option>
-        <option value="7">Juli</option>
-        <option value="8">Agustus</option>
-        <option value="9">September</option>
-        <option value="10">Oktober</option>
-        <option value="11">November</option>
-        <option value="12">Desember</option>
-      </select>
+      <select id="bulan"></select>
 
       <label for="tahun">Tahun:</label>
       <select id="tahun"></select>
@@ -114,20 +105,31 @@
       <button onclick="filterBulan()">Tampilkan</button>
     </div>
 
-    <div id="loading">🔄 Memuat data kehadiran...</div>
+    <div id="loading">🔄 Memuat data rekap...</div>
 
     <div class="table-container">
       <table id="tabelRekap" style="display:none;">
         <thead>
           <tr>
-            <th>Timestamp</th>
+            <th>No</th>
+            <th>Hari</th>
             <th>Tanggal</th>
-            <th>Jam</th>
-            <th>Jenis</th>
-            <th>Lokasi</th>
+            <th>Masuk</th>
+            <th>Pulang</th>
+            <th>Jml Jam Normal</th>
+            <th>Ket</th>
+            <th>Jml Jam Lembur</th>
           </tr>
         </thead>
         <tbody id="isiTabel"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="5" style="text-align:right; font-weight: bold;">TOTAL</td>
+            <td id="totalNormal">0</td>
+            <td>-</td>
+            <td id="totalLembur">0</td>
+          </tr>
+        </tfoot>
       </table>
     </div>
   </div>
@@ -135,7 +137,6 @@
   <script>
     const nip = localStorage.getItem('nip');
     const nama = localStorage.getItem('nama') || "Tim SDS Snack";
-    console.log("📌 NIP dari localStorage:", nip);
     let allData = [];
 
     if (!nip) {
@@ -145,7 +146,17 @@
       document.getElementById("idTeam").textContent = nip;
       document.getElementById("namaTeam").textContent = nama;
 
+      // Isi dropdown tahun dan bulan
+      const bulanSelect = document.getElementById("bulan");
       const tahunSelect = document.getElementById("tahun");
+      const bulanList = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+      bulanList.forEach((b, i) => {
+        const opt = document.createElement("option");
+        opt.value = i + 1;
+        opt.textContent = b;
+        bulanSelect.appendChild(opt);
+      });
+
       const thisYear = new Date().getFullYear();
       for (let y = thisYear - 2; y <= thisYear + 2; y++) {
         const opt = document.createElement("option");
@@ -155,63 +166,70 @@
         tahunSelect.appendChild(opt);
       }
 
-      document.getElementById("bulan").value = (new Date().getMonth() + 1).toString();
+      bulanSelect.value = (new Date().getMonth() + 1).toString();
 
-      fetch(`https://script.google.com/macros/s/AKfycbwrU6tMqwFnWe4zhsH8CpzMEBWib_PVdcx0eGY52P0e_HQZnXq_xsAiyH69tSTG8Yco/exec?action=rekap&nip=${nip}`)
+      fetch(`https://script.google.com/macros/s/AKfycbycm_sMsBZSbfGk3cQYPFl6Ons764H6iN6sLI9YA_evKFc84IRrf3SIO2iY-racyk1W/exec?action=rekap_harian&nip=${nip}`)
         .then(res => res.json())
         .then(data => {
-          console.log("✅ Data hasil fetch:", data);
           document.getElementById("loading").style.display = "none";
           allData = Array.isArray(data) ? data : [];
           filterBulan();
         })
         .catch(err => {
           console.error("Gagal ambil data:", err);
-          alert("❌ Gagal mengambil data kehadiran.");
+          alert("❌ Gagal mengambil data rekap.");
           document.getElementById("loading").textContent = "❌ Gagal memuat data.";
         });
     }
 
     function filterBulan() {
-      const bulan = parseInt(document.getElementById("bulan").value);
-      const tahun = parseInt(document.getElementById("tahun").value);
-      const tbody = document.getElementById("isiTabel");
-      const tabel = document.getElementById("tabelRekap");
+  const bulan = parseInt(document.getElementById("bulan").value);
+  const tahun = parseInt(document.getElementById("tahun").value);
+  const tbody = document.getElementById("isiTabel");
+  const tabel = document.getElementById("tabelRekap");
+  tbody.innerHTML = "";
 
-      tbody.innerHTML = "";
+  const filtered = allData.filter(item => {
+    const [d, m, y] = item.tanggal.split("/").map(Number);
+    return m === bulan && y === tahun;
+  });
 
-      const filtered = allData.filter(item => {
-        if (!item.tanggal || !item.tanggal.includes("/")) return false;
-        const parts = item.tanggal.split("/");
-        const itemBulan = parseInt(parts[1]);
-        const itemTahun = parseInt(parts[2]);
-        return itemBulan === bulan && itemTahun === tahun;
-      });
+  if (filtered.length === 0) {
+    tbody.innerHTML = "<tr><td colspan='8'>Tidak ada data bulan ini.</td></tr>";
+    tabel.style.display = "table";
+    return;
+  }
 
-      if (filtered.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5'>Tidak ada data untuk bulan ini.</td></tr>";
-        tabel.style.display = "table";
-        return;
-      }
+  let totalNormal = 0;
+  let totalLembur = 0;
 
-      filtered.forEach(item => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.timestamp}</td>
-          <td>${item.tanggal}</td>
-          <td>${item.jam}</td>
-          <td>${item.jenis}</td>
-          <td>${item.lokasi}</td>
-        `;
-        tbody.appendChild(row);
-      });
-
-      tabel.style.display = "table";
+  filtered.forEach((item, i) => {
+    const row = document.createElement("tr");
+    if (item.ket === "Lembur") {
+      row.classList.add("lembur-row");
     }
+    row.innerHTML = `
+      <td>${i + 1}</td>
+      <td>${item.hari}</td>
+      <td>${item.tanggal}</td>
+      <td>${item.masuk}</td>
+      <td>${item.pulang}</td>
+      <td>${item.jamNormal}</td>
+      <td>${item.ket}</td>
+      <td>${item.jamLembur}</td>
+    `;
+    tbody.appendChild(row);
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
-    }
+    totalNormal += parseFloat(item.jamNormal || 0);
+    totalLembur += parseFloat(item.jamLembur || 0);
+  });
+
+  document.getElementById("totalNormal").textContent = totalNormal.toFixed(2);
+  document.getElementById("totalLembur").textContent = totalLembur.toFixed(2);
+
+  tabel.style.display = "table";
+}
+
   </script>
 </body>
 </html>
