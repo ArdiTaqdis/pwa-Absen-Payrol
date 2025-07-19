@@ -136,9 +136,10 @@
         });
     }
 
-    function formatRupiah(angka) {
-      return new Intl.NumberFormat('id-ID').format(angka);
+     function formatRupiah(angka) {
+      return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(angka);
     }
+
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
