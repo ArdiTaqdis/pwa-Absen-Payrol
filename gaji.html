@@ -21,30 +21,24 @@
     }
     h2 {
       text-align: center;
-      margin-bottom: 1rem;
-    }
-    .info, .periode-box {
       margin-bottom: 1.5rem;
     }
+    .info {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
     .periode-box {
-      background-color: #f1f8ff;
-      padding: 1rem;
+      background-color: #e3f2fd;
+      padding: 1.5rem;
       border-radius: 10px;
-      border-left: 5px solid #2196f3;
+      margin-bottom: 1.5rem;
     }
     .periode-box p {
       margin: 0.4rem 0;
     }
     .label {
       font-weight: bold;
-    }
-    .total-gaji {
-      font-size: 1.2rem;
-      background: #e8f5e9;
-      padding: 1rem;
-      border-radius: 10px;
-      border-left: 5px solid #4caf50;
-      margin-top: 2rem;
     }
     .back {
       margin-bottom: 1.5rem;
@@ -54,6 +48,14 @@
       color: white;
       padding: 0.6rem 1rem;
       border-radius: 5px;
+    }
+    hr {
+      margin: 1rem 0;
+    }
+    .total {
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -70,31 +72,26 @@
     <div id="loading">🔄 Memuat data gaji...</div>
 
     <div id="gajiBox" style="display:none;">
-      <!-- Tambahkan di dalam gajiBox -->
-        <div>
-          <h3>Periode 1–15</h3>
-          <p>Jam Kerja: <span id="jamKerja1"></span> jam</p>
-          <p>Lembur: <span id="lembur1"></span> jam</p>
-          <p>Gaji Pokok: Rp <span id="gajiPokok1"></span></p>
-          <p>Gaji Lembur: Rp <span id="gajiLembur1"></span></p>
-          <p><strong>Subtotal: Rp <span id="subtotal1"></span></strong></p>
-        </div>
-        <hr>
-        <div>
-          <h3>Periode 16–31</h3>
-          <p>Jam Kerja: <span id="jamKerja2"></span> jam</p>
-          <p>Lembur: <span id="lembur2"></span> jam</p>
-          <p>Gaji Pokok: Rp <span id="gajiPokok2"></span></p>
-          <p>Gaji Lembur: Rp <span id="gajiLembur2"></span></p>
-          <p><strong>Subtotal: Rp <span id="subtotal2"></span></strong></p>
-        </div>
-        <hr>
-        <p><strong>Total Gaji: Rp <span id="totalGaji"></span></strong></p>
-
-
-      <div class="total-gaji">
-        <p><span class="label">Total Gaji Bulan Ini:</span> <strong>Rp <span id="totalGaji"></span></strong></p>
+      <div class="periode-box">
+        <h3>Periode 1 – 15</h3>
+        <p>Jam Kerja: <span id="jamNormal1">0</span> jam</p>
+        <p>Lembur: <span id="lembur1">0</span> jam</p>
+        <p>Gaji Pokok: Rp <span id="gajiPokok1">0</span></p>
+        <p>Gaji Lembur: Rp <span id="gajiLembur1">0</span></p>
+        <p><strong>Subtotal: Rp <span id="subtotal1">0</span></strong></p>
       </div>
+
+      <div class="periode-box">
+        <h3>Periode 16 – 31</h3>
+        <p>Jam Kerja: <span id="jamNormal2">0</span> jam</p>
+        <p>Lembur: <span id="lembur2">0</span> jam</p>
+        <p>Gaji Pokok: Rp <span id="gajiPokok2">0</span></p>
+        <p>Gaji Lembur: Rp <span id="gajiLembur2">0</span></p>
+        <p><strong>Subtotal: Rp <span id="subtotal2">0</span></strong></p>
+      </div>
+
+      <hr />
+      <div class="total">Total Gaji: Rp <span id="totalGaji">0</span></div>
     </div>
   </div>
 
@@ -109,28 +106,31 @@
       document.getElementById("idTeam").textContent = nip;
       document.getElementById("namaTeam").textContent = nama;
 
-      const url = "https://script.google.com/macros/s/AKfycbztpKqWJd5E297PBPenF2_59G4T09Of1xVdo8BXxqOfXH41t4krT5cHpD101EAKKtic/exec";
+      const url = "https://script.google.com/macros/s/AKfycbzofy_Z6eOlNa_Btz63XXC7PjDQyyNhJDKI0VSzAYxeyDaWSY4kHuXmtvciy8vsCGtm/exec";
+
       fetch(`${url}?action=gaji&nip=${nip}`)
         .then(res => res.json())
         .then(data => {
-          if (!data || !data.periode1) throw new Error("Data tidak ditemukan");
+          const p1 = data.periode1;
+          const p2 = data.periode2;
 
           // Periode 1
-          document.getElementById('jam1').textContent = data.periode1.jamNormal;
-          document.getElementById('lembur1').textContent = data.periode1.lembur;
-          document.getElementById('pokok1').textContent = formatRupiah(data.periode1.gajiPokok);
-          document.getElementById('lemburGaji1').textContent = formatRupiah(data.periode1.gajiLembur);
-          document.getElementById('subtotal1').textContent = formatRupiah(data.periode1.subtotal);
+          document.getElementById('jamNormal1').textContent = p1.jamNormal;
+          document.getElementById('lembur1').textContent = p1.lembur;
+          document.getElementById('gajiPokok1').textContent = formatRupiah(p1.gajiPokok);
+          document.getElementById('gajiLembur1').textContent = formatRupiah(p1.gajiLembur);
+          document.getElementById('subtotal1').textContent = formatRupiah(p1.subtotal);
 
           // Periode 2
-          document.getElementById('jam2').textContent = data.periode2.jamNormal;
-          document.getElementById('lembur2').textContent = data.periode2.lembur;
-          document.getElementById('pokok2').textContent = formatRupiah(data.periode2.gajiPokok);
-          document.getElementById('lemburGaji2').textContent = formatRupiah(data.periode2.gajiLembur);
-          document.getElementById('subtotal2').textContent = formatRupiah(data.periode2.subtotal);
+          document.getElementById('jamNormal2').textContent = p2.jamNormal;
+          document.getElementById('lembur2').textContent = p2.lembur;
+          document.getElementById('gajiPokok2').textContent = formatRupiah(p2.gajiPokok);
+          document.getElementById('gajiLembur2').textContent = formatRupiah(p2.gajiLembur);
+          document.getElementById('subtotal2').textContent = formatRupiah(p2.subtotal);
 
           // Total
           document.getElementById('totalGaji').textContent = formatRupiah(data.totalGaji);
+
           document.getElementById("loading").style.display = "none";
           document.getElementById("gajiBox").style.display = "block";
         })
@@ -140,10 +140,9 @@
         });
     }
 
-     function formatRupiah(angka) {
-      return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 0 }).format(angka);
+    function formatRupiah(angka) {
+      return new Intl.NumberFormat('id-ID').format(Math.round(angka));
     }
-
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
