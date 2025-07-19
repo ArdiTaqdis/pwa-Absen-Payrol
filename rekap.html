@@ -69,18 +69,14 @@
       color: white;
       font-weight: 600;
     }
+    .lembur-row {
+      background-color: #f3e5f5 !important;
+    }
     #loading {
       text-align: center;
       margin-top: 1rem;
       font-size: 13px;
     }
-
-
-    .lembur-row {
-      background-color: #f3e5f5 !important; /* ungu pastel */
-    }
-
-
     @media (max-width: 768px) {
       table {
         min-width: 900px;
@@ -124,7 +120,7 @@
         <tbody id="isiTabel"></tbody>
         <tfoot>
           <tr>
-            <td colspan="5" style="text-align:right; font-weight: bold;">TOTAL</td>
+            <td colspan="5" style="text-align:right; font-weight:bold;">TOTAL</td>
             <td id="totalNormal">0</td>
             <td>-</td>
             <td id="totalLembur">0</td>
@@ -146,7 +142,6 @@
       document.getElementById("idTeam").textContent = nip;
       document.getElementById("namaTeam").textContent = nama;
 
-      // Isi dropdown tahun dan bulan
       const bulanSelect = document.getElementById("bulan");
       const tahunSelect = document.getElementById("tahun");
       const bulanList = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
@@ -168,7 +163,7 @@
 
       bulanSelect.value = (new Date().getMonth() + 1).toString();
 
-      fetch(`https://script.google.com/macros/s/AKfycbycm_sMsBZSbfGk3cQYPFl6Ons764H6iN6sLI9YA_evKFc84IRrf3SIO2iY-racyk1W/exec?action=rekap_harian&nip=${nip}`)
+      fetch(`https://script.google.com/macros/s/AKfycbxs68EGIiUydP_JciFlaEqDL45E3JkCtYJor02I_84s2f9Ojo0F6Pict1hDm0z8n_nb/exec?action=rekap_harian&nip=${nip}`)
         .then(res => res.json())
         .then(data => {
           document.getElementById("loading").style.display = "none";
@@ -183,53 +178,56 @@
     }
 
     function filterBulan() {
-  const bulan = parseInt(document.getElementById("bulan").value);
-  const tahun = parseInt(document.getElementById("tahun").value);
-  const tbody = document.getElementById("isiTabel");
-  const tabel = document.getElementById("tabelRekap");
-  tbody.innerHTML = "";
+      const bulan = parseInt(document.getElementById("bulan").value);
+      const tahun = parseInt(document.getElementById("tahun").value);
+      const tbody = document.getElementById("isiTabel");
+      const tabel = document.getElementById("tabelRekap");
+      tbody.innerHTML = "";
 
-  const filtered = allData.filter(item => {
-    const [d, m, y] = item.tanggal.split("/").map(Number);
-    return m === bulan && y === tahun;
-  });
+      const filtered = allData.filter(item => {
+        const [d, m, y] = item.tanggal.split("/").map(Number);
+        return m === bulan && y === tahun;
+      });
 
-  if (filtered.length === 0) {
-    tbody.innerHTML = "<tr><td colspan='8'>Tidak ada data bulan ini.</td></tr>";
-    tabel.style.display = "table";
-    return;
-  }
+      if (filtered.length === 0) {
+        tbody.innerHTML = "<tr><td colspan='8'>Tidak ada data bulan ini.</td></tr>";
+        tabel.style.display = "table";
+        return;
+      }
 
-  let totalNormal = 0;
-  let totalLembur = 0;
+      let totalNormal = 0;
+      let totalLembur = 0;
 
-  filtered.forEach((item, i) => {
-    const row = document.createElement("tr");
-    if (item.ket === "Lembur") {
-      row.classList.add("lembur-row");
+      filtered.forEach((item, i) => {
+        const row = document.createElement("tr");
+        if (item.ket === "Lembur") {
+          row.classList.add("lembur-row");
+        }
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${item.hari}</td>
+          <td>${item.tanggal}</td>
+          <td>${item.masuk}</td>
+          <td>${item.pulang}</td>
+          <td>${item.jamNormal}</td>
+          <td>${item.ket}</td>
+          <td>${item.jamLembur}</td>
+        `;
+        tbody.appendChild(row);
+
+        totalNormal += parseFloat(item.jamNormal || 0);
+        totalLembur += parseFloat(item.jamLembur || 0);
+      });
+
+      document.getElementById("totalNormal").textContent = totalNormal.toFixed(2);
+      document.getElementById("totalLembur").textContent = totalLembur.toFixed(2);
+
+      tabel.style.display = "table";
     }
-    row.innerHTML = `
-      <td>${i + 1}</td>
-      <td>${item.hari}</td>
-      <td>${item.tanggal}</td>
-      <td>${item.masuk}</td>
-      <td>${item.pulang}</td>
-      <td>${item.jamNormal}</td>
-      <td>${item.ket}</td>
-      <td>${item.jamLembur}</td>
-    `;
-    tbody.appendChild(row);
 
-    totalNormal += parseFloat(item.jamNormal || 0);
-    totalLembur += parseFloat(item.jamLembur || 0);
-  });
-
-  document.getElementById("totalNormal").textContent = totalNormal.toFixed(2);
-  document.getElementById("totalLembur").textContent = totalLembur.toFixed(2);
-
-  tabel.style.display = "table";
-}
-
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
   </script>
 </body>
 </html>
