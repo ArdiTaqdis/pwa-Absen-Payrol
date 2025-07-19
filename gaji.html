@@ -70,23 +70,27 @@
     <div id="loading">🔄 Memuat data gaji...</div>
 
     <div id="gajiBox" style="display:none;">
-      <div class="periode-box">
-        <h4>Periode 1 – 15</h4>
-        <p><span class="label">Jam Kerja:</span> <span id="jam1"></span> jam</p>
-        <p><span class="label">Lembur:</span> <span id="lembur1"></span> jam</p>
-        <p><span class="label">Gaji Pokok:</span> Rp <span id="pokok1"></span></p>
-        <p><span class="label">Gaji Lembur:</span> Rp <span id="lemburGaji1"></span></p>
-        <p><span class="label">Subtotal:</span> Rp <span id="subtotal1"></span></p>
-      </div>
+      <!-- Tambahkan di dalam gajiBox -->
+        <div>
+          <h3>Periode 1–15</h3>
+          <p>Jam Kerja: <span id="jamKerja1"></span> jam</p>
+          <p>Lembur: <span id="lembur1"></span> jam</p>
+          <p>Gaji Pokok: Rp <span id="gajiPokok1"></span></p>
+          <p>Gaji Lembur: Rp <span id="gajiLembur1"></span></p>
+          <p><strong>Subtotal: Rp <span id="subtotal1"></span></strong></p>
+        </div>
+        <hr>
+        <div>
+          <h3>Periode 16–31</h3>
+          <p>Jam Kerja: <span id="jamKerja2"></span> jam</p>
+          <p>Lembur: <span id="lembur2"></span> jam</p>
+          <p>Gaji Pokok: Rp <span id="gajiPokok2"></span></p>
+          <p>Gaji Lembur: Rp <span id="gajiLembur2"></span></p>
+          <p><strong>Subtotal: Rp <span id="subtotal2"></span></strong></p>
+        </div>
+        <hr>
+        <p><strong>Total Gaji: Rp <span id="totalGaji"></span></strong></p>
 
-      <div class="periode-box">
-        <h4>Periode 16 – 31</h4>
-        <p><span class="label">Jam Kerja:</span> <span id="jam2"></span> jam</p>
-        <p><span class="label">Lembur:</span> <span id="lembur2"></span> jam</p>
-        <p><span class="label">Gaji Pokok:</span> Rp <span id="pokok2"></span></p>
-        <p><span class="label">Gaji Lembur:</span> Rp <span id="lemburGaji2"></span></p>
-        <p><span class="label">Subtotal:</span> Rp <span id="subtotal2"></span></p>
-      </div>
 
       <div class="total-gaji">
         <p><span class="label">Total Gaji Bulan Ini:</span> <strong>Rp <span id="totalGaji"></span></strong></p>
@@ -105,7 +109,7 @@
       document.getElementById("idTeam").textContent = nip;
       document.getElementById("namaTeam").textContent = nama;
 
-      const url = "https://script.google.com/macros/s/AKfycbz12NVxjgtrGEaUwho3uzGUJFoiDgqfPLiiyWapbe-cA4x4RMm-QHEbJOuYJboYZo4U/exec";
+      const url = "https://script.google.com/macros/s/AKfycbztpKqWJd5E297PBPenF2_59G4T09Of1xVdo8BXxqOfXH41t4krT5cHpD101EAKKtic/exec";
       fetch(`${url}?action=gaji&nip=${nip}`)
         .then(res => res.json())
         .then(data => {
