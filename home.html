@@ -102,6 +102,12 @@
       text-align: center;
     }
 
+       .menu-item.disabled {
+      opacity: 0.6;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
+
     .logout button {
       padding: 0.7rem 2rem;
       background: #7f0beb;
@@ -142,7 +148,7 @@
           <div class="icon">💰</div>
           <div>Gaji</div>
         </div>
-        <div class="menu-item" onclick="location.href='slip-admin.html'">
+        <div class="menu-item" id="adminMenu" onclick="goToAdmin()">
           <div class="icon">📋</div>
           <div>Admin</div>
         </div>
@@ -191,6 +197,20 @@
       const nama = encodeURIComponent(localStorage.getItem('nama') || '');
       window.location.href = `form.html?nip=${nip}&nama=${nama}`;
     }
+
+    if (localStorage.getItem("role") !== "admin") {
+        document.getElementById("adminMenu").classList.add("disabled");
+      }
+
+    function goToAdmin() {
+      const role = localStorage.getItem("role");
+      if (role === "admin") {
+        location.href = "slip-admin.html";
+      } else {
+        alert("⛔ Hanya admin yang bisa mengakses halaman ini.");
+      }
+    }
+
   </script>
 </body>
 </html>

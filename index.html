@@ -87,7 +87,7 @@
       0% { transform: translateY(-50%) rotate(0deg); }
       100% { transform: translateY(-50%) rotate(360deg); }
     }
-
+ 
     .info {
       font-size: 0.70rem;
       color: #777;
@@ -108,7 +108,7 @@
   </div>
 
 <script>
-  const scriptURL = "https://script.google.com/macros/s/AKfycbz9Xaaaej7zMUfM2rqCVW5TjlNoQFk9hUocbYpYgZHcxLYh8VSH1yke7SPahQcbfpUZ/exec";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbzEIQhILGJni-MPHMFVGyy_V8ceUI7XuC4giC5zWOaACeAThJ2oqKqi3YsEewNSIPA/exec";
 
   function login() {
     const nip = document.getElementById('nip').value.trim();
@@ -131,6 +131,7 @@
         if (data.status === "ok") {
           localStorage.setItem('nip', nip);
           localStorage.setItem('nama', data.nama || '');
+          localStorage.setItem('role', data.role || 'user')
           window.location.href = "home.html";
         } else {
           alert("❌ NIP tidak terdaftar di DataKaryawan");
