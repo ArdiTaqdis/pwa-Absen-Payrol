@@ -2,25 +2,24 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Slip Gaji Admin - Tim SDS Snack</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      padding: 2rem;
       background: #f4f6f8;
+      padding: 2rem;
     }
     h1 {
       text-align: center;
-      margin-bottom: 2rem;
       color: #4a148c;
     }
     .filter {
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
-      margin-bottom: 1.5rem;
       justify-content: center;
+      margin: 1rem 0;
     }
     select, button {
       padding: 0.6rem 1rem;
@@ -30,7 +29,7 @@
       width: 100%;
       border-collapse: collapse;
       background: white;
-      margin-bottom: 2rem;
+      margin-top: 1rem;
     }
     th, td {
       border: 1px solid #ccc;
@@ -75,11 +74,12 @@
       padding: 0.5rem;
     }
     .modal-content button {
-      margin-right: 1rem;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
 <body>
+
   <h1>Rekap Gaji Tim SDS Snack</h1>
 
   <div class="filter">
@@ -95,23 +95,26 @@
     <button onclick="tampilkanSlip()">Lihat Slip</button>
   </div>
 
-  <table id="tabelRekap">
+  <table id="tabelSemuaGaji">
     <thead>
       <tr>
         <th>No</th>
         <th>NIP</th>
         <th>Nama</th>
-        <th>Jam Kerja</th>
-        <th>Lembur</th>
-        <th>Gaji Pokok</th>
-        <th>Lembur</th>
-        <th>Subtotal</th>
+        <th>Gaji Periode 1</th>
+        <th>Gaji Periode 2</th>
+        <th>Total</th>
         <th>Aksi</th>
       </tr>
     </thead>
-    <tbody id="rekapBody">
-      <tr><td colspan="9">Memuat data...</td></tr>
-    </tbody>
+    <tbody id="rekapBody"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="5" style="text-align:right; font-weight:bold;">Total Keseluruhan</td>
+        <td id="totalSemuaGaji" style="font-weight:bold; color:green;"></td>
+        <td></td>
+      </tr>
+    </tfoot>
   </table>
 
   <!-- Modal Slip Gaji -->
@@ -148,12 +151,28 @@
         </tfoot>
       </table>
 
+      <p><strong>Status Pembayaran:</strong>
+        <select id="statusPembayaran">
+          <option value="Belum Dibayarkan">Belum Dibayarkan</option>
+          <option value="Sudah Dibayarkan">Sudah Dibayarkan</option>
+        </select>
+      </p>
+
       <p><strong>Catatan:</strong><br>
         Slip ini dibuat otomatis oleh sistem. Jika ada kesalahan, silakan konfirmasi ke Admin SDS Snack.
       </p>
 
+      <!-- Hidden Info untuk WhatsApp -->
+      <div style="display:none">
+        <span id="slipNIP"></span>
+        <span id="slipNama"></span>
+        <span id="slipPeriode"></span>
+        <span id="slipTotalGaji"></span>
+      </div>
+
       <button onclick="tutupSlip()">Tutup</button>
       <button onclick="window.print()">Cetak</button>
+      <button id="btnKirimWA">📤 Kirim ke WhatsApp</button>
     </div>
   </div>
 
@@ -176,35 +195,38 @@
     async function loadRekap() {
       const res = await fetch(`${baseUrl}?action=allNIP`);
       const nipList = await res.json();
-
       const tbody = document.getElementById("rekapBody");
       tbody.innerHTML = "";
 
+      let total = 0;
       let no = 1;
+
       for (const data of nipList) {
         const gajiRes = await fetch(`${baseUrl}?action=gaji&nip=${data.nip}`);
         const gaji = await gajiRes.json();
-        const periode = document.getElementById("periodeSelect").value === "1" ? gaji.periode1 : gaji.periode2;
+
+        const totalGaji = gaji.totalGaji || 0;
+        total += totalGaji;
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${no++}</td>
           <td>${data.nip}</td>
           <td>${data.nama}</td>
-          <td>${periode.jamNormal}</td>
-          <td>${periode.lembur}</td>
-          <td>${formatRupiah(periode.gajiPokok)}</td>
-          <td>${formatRupiah(periode.gajiLembur)}</td>
-          <td>${formatRupiah(periode.subtotal)}</td>
+          <td>${formatRupiah(gaji.periode1.subtotal)}</td>
+          <td>${formatRupiah(gaji.periode2.subtotal)}</td>
+          <td>${formatRupiah(totalGaji)}</td>
           <td><button onclick="tampilkanSlip('${data.nip}', '${data.nama}')">Slip</button></td>
         `;
         tbody.appendChild(tr);
       }
+
+      document.getElementById("totalSemuaGaji").textContent = formatRupiah(total);
     }
 
     async function tampilkanSlip(nipParam = null, namaParam = null) {
       const nip = nipParam || document.getElementById("nipSelect").value;
-      const nama = namaParam || (document.getElementById("nipSelect").selectedOptions[0]?.textContent.split(" - ")[1] || "Tim");
+      const nama = namaParam || document.getElementById("nipSelect").selectedOptions[0].textContent.split(" - ")[1];
       const periode = document.getElementById("periodeSelect").value;
 
       const res = await fetch(`${baseUrl}?action=gaji&nip=${nip}`);
@@ -222,6 +244,12 @@
       document.getElementById("gajiLembur").textContent = formatRupiah(p.gajiLembur);
       document.getElementById("totalGaji").textContent = formatRupiah(p.subtotal);
 
+      // isi data untuk WA
+      document.getElementById("slipNIP").innerText = nip;
+      document.getElementById("slipNama").innerText = nama;
+      document.getElementById("slipPeriode").innerText = p.tanggal;
+      document.getElementById("slipTotalGaji").innerText = formatRupiah(p.subtotal);
+
       document.getElementById("slipModal").classList.remove("hidden");
     }
 
@@ -237,6 +265,31 @@
       loadNIPOptions();
       loadRekap();
       document.getElementById("periodeSelect").addEventListener("change", loadRekap);
+
+      document.getElementById("btnKirimWA").addEventListener("click", () => {
+        const nip = document.getElementById("slipNIP").innerText;
+        const nama = document.getElementById("slipNama").innerText;
+        const periode = document.getElementById("slipPeriode").innerText;
+        const total = document.getElementById("slipTotalGaji").innerText;
+        const status = document.getElementById("statusPembayaran").value;
+
+        const pesan = `
+Slip Gaji SDS Snack
+Nama: ${nama}
+NIP: ${nip}
+Periode: ${periode}
+Total Gaji: ${total}
+Status: ${status}
+
+Terima kasih atas dedikasi Anda.
+        `.trim();
+
+        const noWa = prompt("Masukkan nomor WhatsApp (628xxxxxx):");
+        if (noWa) {
+          const url = `https://wa.me/${noWa}?text=${encodeURIComponent(pesan)}`;
+          window.open(url, "_blank");
+        }
+      });
     });
   </script>
 </body>
