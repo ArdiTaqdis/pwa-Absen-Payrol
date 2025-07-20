@@ -3,26 +3,97 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Slip Gaji- Tim SDS Snack</title>
+  <title>Slip Gaji - Tim SDS Snack</title>
   <style>
-    body { font-family: 'Segoe UI', sans-serif; padding: 2rem; background: #f4f6f8; }
-    h1 { text-align: center; margin-bottom: 2rem; color: #4a148c; }
-    .filter { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2rem; }
-    select, button { padding: 0.6rem 1rem; font-size: 1rem; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 1rem;
+      background: #f4f6f8;
+      margin: 0;
+    }
+    h1 {
+      text-align: center;
+      color: #4a148c;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    .filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .filter label {
+      font-size: 0.9rem;
+    }
+    select, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border-radius: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.6rem;
+      text-align: center;
+    }
+    th {
+      background-color: #6a1b9a;
+      color: white;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      padding: 1rem;
+      border-radius: 10px;
+      width: 95%;
+      max-width: 480px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+    .modal-content table {
+      width: 100%;
+      font-size: 0.85rem;
+    }
+    .modal-content button {
+      margin-top: 0.5rem;
+      margin-right: 0.5rem;
+      padding: 0.5rem 1rem;
+    }
 
-    table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 2rem; }
-    th, td { border: 1px solid #ccc; padding: 0.75rem; text-align: center; }
-    th { background-color: #6a1b9a; color: white; }
-
-    .modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; }
-    .modal.show { display: flex; }
-    .modal-content { background: white; padding: 2rem; border-radius: 10px; max-width: 500px; width: 100%; }
-    .modal-content table { width: 100%; margin: 1rem 0; }
-    .modal-content th, .modal-content td { padding: 0.5rem; }
-    .modal-content button { margin-right: 0.5rem; }
+    @media (max-width: 480px) {
+      th, td {
+        padding: 0.4rem;
+      }
+      .modal-content {
+        padding: 1rem 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
+
   <h1>Rekap Gaji Tim SDS Snack</h1>
 
   <div class="filter">
@@ -44,30 +115,32 @@
     <button onclick="loadRekap()">🔍 Tampilkan</button>
   </div>
 
-  <table>
-    <thead>
-      <tr>
-        <th>NIP</th>
-        <th>Nama</th>
-        <th>Gaji Pokok</th>
-        <th>Lembur</th>
-        <th>Subtotal</th>
-        <th>Aksi</th>
-      </tr>
-    </thead>
-    <tbody id="rekapBody"></tbody>
-    <tfoot>
-      <tr>
-        <td colspan="4" style="text-align:right"><strong>Total Gaji:</strong></td>
-        <td colspan="2" id="totalSemuaGaji" style="color:green; font-weight:bold;"></td>
-      </tr>
-    </tfoot>
-  </table>
+  <div style="overflow-x: auto;">
+    <table>
+      <thead>
+        <tr>
+          <th>NIP</th>
+          <th>Nama</th>
+          <th>Gaji Pokok</th>
+          <th>Lembur</th>
+          <th>Subtotal</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="rekapBody"></tbody>
+      <tfoot>
+        <tr>
+          <td colspan="4" style="text-align:right"><strong>Total Gaji:</strong></td>
+          <td colspan="2" id="totalSemuaGaji" style="color:green; font-weight:bold;"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
   <!-- Modal -->
   <div class="modal" id="slipModal">
     <div class="modal-content">
-      <h2>Slip Gaji Tim SDS Snack</h2>
+      <h2 style="text-align:center; color:#6a1b9a;">Slip Gaji</h2>
       <p><strong>Nama:</strong> <span id="slipNama"></span></p>
       <p><strong>NIP:</strong> <span id="slipNIP"></span></p>
       <p><strong>Periode:</strong> <span id="slipPeriode"></span></p>
@@ -91,7 +164,7 @@
           </tr>
         </tbody>
         <tfoot>
-          <tr><td colspan="3"><strong>Total Gaji</strong></td><td id="slipTotalGaji"></td></tr>
+          <tr><td colspan="3"><strong>Total</strong></td><td id="slipTotalGaji"></td></tr>
         </tfoot>
       </table>
 
@@ -101,20 +174,19 @@
         <option>Sudah Dibayarkan</option>
       </select>
 
-      <p><em>Slip ini dibuat otomatis oleh sistem SDS Snack. Silakan hubungi admin jika ada kesalahan.</em></p>
+      <p style="font-size:0.85rem; font-style:italic;">Slip ini dibuat otomatis oleh sistem SDS Snack.</p>
 
-      <button onclick="tutupSlip()">Tutup</button>
-      <button onclick="cetakSlip()">🖨 Cetak</button>
-      <button onclick="kirimWA()">📤 Kirim WA</button>
+      <div style="text-align:center; margin-top:1rem;">
+        <button onclick="tutupSlip()">Tutup</button>
+        <button onclick="cetakSlip()">🖨 Cetak</button>
+        <button onclick="kirimWA()">📤 Kirim WA</button>
+      </div>
     </div>
   </div>
 
-  
-
   <script>
     let currentNoWa = "";
-
-    const baseUrl = "https://script.google.com/macros/s/AKfycbz0i9HAs-BHnUfE6Jqneu0HOwBz6NY1NKtBUFMGuNDwaWFnK_gWlMh8EMCCRVqgEz9K/exec"; // Ganti dengan URL Web App-mu
+    const baseUrl = "https://script.google.com/macros/s/AKfycbzp8JYSjyVaCHwkpzFqaT4Q0jaSpM45sHgnCxsTaBAee4259iQ_WaSXwmijwYhGbow7/exec";
 
     async function loadNIPOptions() {
       const res = await fetch(`${baseUrl}?action=allNIP`);
@@ -181,9 +253,8 @@
       document.getElementById("slipGajiLembur").textContent = formatRupiah(p.gajiLembur);
       document.getElementById("slipTotalGaji").textContent = formatRupiah(p.subtotal);
 
-      document.getElementById("slipModal").classList.add("show");
       currentNoWa = data.noWa || "";
-
+      document.getElementById("slipModal").classList.add("show");
     }
 
     function tutupSlip() {
@@ -202,15 +273,13 @@
       const status = document.getElementById("statusPembayaran").value;
 
       if (!currentNoWa) return alert("Nomor WhatsApp tidak ditemukan.");
-
       const pesan = `Slip Gaji SDS Snack\nNama: ${nama}\nNIP: ${nip}\nPeriode: ${periode}\nTotal Gaji: ${total}\nStatus: ${status}`;
       window.open(`https://wa.me/${currentNoWa}?text=${encodeURIComponent(pesan)}`, "_blank");
     }
 
-
     function getNamaBulan(bulan) {
-      const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
-                        "Agustus", "September", "Oktober", "November", "Desember"];
+      const namaBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli",
+                         "Agustus","September","Oktober","November","Desember"];
       return namaBulan[bulan - 1] || "";
     }
 
