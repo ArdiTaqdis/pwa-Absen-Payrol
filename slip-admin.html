@@ -177,6 +177,7 @@
       <p style="font-size:0.85rem; font-style:italic;">Slip ini dibuat otomatis oleh sistem SDS Snack.</p>
 
       <div style="text-align:center; margin-top:1rem;">
+        <button onclick="simpanStatus()">💾 Simpan Status</button>
         <button onclick="tutupSlip()">Tutup</button>
         <button onclick="cetakSlip()">🖨 Cetak</button>
         <button onclick="kirimWA()">📤 Kirim WA</button>
@@ -186,7 +187,7 @@
 
   <script>
     let currentNoWa = "";
-    const baseUrl = "https://script.google.com/macros/s/AKfycbzp8JYSjyVaCHwkpzFqaT4Q0jaSpM45sHgnCxsTaBAee4259iQ_WaSXwmijwYhGbow7/exec";
+    const baseUrl = "https://script.google.com/macros/s/AKfycbyHei8iwoXohpIUdzo2ksKI0Ovw7Q3kcZ4p7iF2_uWAJgeXHeUBUFFL9LqEX9DDxKcR/exec";
 
     async function loadNIPOptions() {
       const res = await fetch(`${baseUrl}?action=allNIP`);
@@ -277,11 +278,48 @@
       window.open(`https://wa.me/${currentNoWa}?text=${encodeURIComponent(pesan)}`, "_blank");
     }
 
+    
+
     function getNamaBulan(bulan) {
       const namaBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli",
                          "Agustus","September","Oktober","November","Desember"];
       return namaBulan[bulan - 1] || "";
     }
+
+    async function simpanStatus() {
+    const data = {
+      action: "simpanStatusGaji",
+      nip: document.getElementById("slipNIP").textContent,
+      nama: document.getElementById("slipNama").textContent,
+      periode: document.getElementById("slipPeriode").textContent.split(" ")[0], // "1–15" atau "16–31"
+      bulan: document.getElementById("bulanSelect").value,
+      tahun: document.getElementById("tahunSelect").value,
+      jamKerja: document.getElementById("slipJamKerja").textContent,
+      lembur: document.getElementById("slipJamLembur").textContent,
+      gajiPokok: getAngka(document.getElementById("slipGajiPokok").textContent),
+      gajiLembur: getAngka(document.getElementById("slipGajiLembur").textContent),
+      subtotal: getAngka(document.getElementById("slipTotalGaji").textContent),
+      status: document.getElementById("statusPembayaran").value
+    };
+
+    const res = await fetch(baseUrl, {
+      method: "POST",
+      body: JSON.stringify(data),
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const result = await res.json();
+    if (result.status === "success") {
+      alert("✅ Status berhasil disimpan.");
+    } else {
+      alert("❌ Gagal menyimpan status: " + result.message);
+    }
+  }
+
+  function getAngka(rupiah) {
+    return parseInt(rupiah.replace(/[^0-9]/g, '')) || 0;
+  }
+
 
     function formatRupiah(value) {
       return new Intl.NumberFormat("id-ID", { style: 'currency', currency: 'IDR' }).format(value);
