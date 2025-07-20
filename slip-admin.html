@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Slip Gaji Admin - Tim SDS Snack</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      background: #f4f6f8;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #4a148c;
+    }
+    .filter {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      justify-content: center;
+    }
+    select, button {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      margin-bottom: 2rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.75rem;
+      text-align: center;
+    }
+    th {
+      background-color: #6a1b9a;
+      color: white;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.hidden {
+      display: none;
+    }
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 100%;
+    }
+    .modal-content h2 {
+      text-align: center;
+      color: #4a148c;
+    }
+    .modal-content table {
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .modal-content table td,
+    .modal-content table th {
+      padding: 0.5rem;
+    }
+    .modal-content button {
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rekap Gaji Tim SDS Snack</h1>
+
+  <div class="filter">
+    <label for="nipSelect">Pilih NIP:</label>
+    <select id="nipSelect"></select>
+
+    <label for="periodeSelect">Pilih Periode:</label>
+    <select id="periodeSelect">
+      <option value="1">1–15</option>
+      <option value="2">16–31</option>
+    </select>
+
+    <button onclick="tampilkanSlip()">Lihat Slip</button>
+  </div>
+
+  <table id="tabelRekap">
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>NIP</th>
+        <th>Nama</th>
+        <th>Jam Kerja</th>
+        <th>Lembur</th>
+        <th>Gaji Pokok</th>
+        <th>Lembur</th>
+        <th>Subtotal</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="rekapBody">
+      <tr><td colspan="9">Memuat data...</td></tr>
+    </tbody>
+  </table>
+
+  <!-- Modal Slip Gaji -->
+  <div id="slipModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Slip Gaji - Tim SDS Snack</h2>
+      <p><strong>Nama Tim:</strong> <span id="namaTim"></span></p>
+      <p><strong>ID Tim:</strong> <span id="idTim"></span></p>
+      <p><strong>Periode:</strong> <span id="periodeText"></span></p>
+
+      <table>
+        <thead>
+          <tr><th>Komponen</th><th>Jumlah Jam</th><th>Tarif / Jam</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Jam Kerja</td>
+            <td id="jamKerja"></td>
+            <td id="tarifNormal"></td>
+            <td id="gajiPokok"></td>
+          </tr>
+          <tr>
+            <td>Jam Lembur</td>
+            <td id="jamLembur"></td>
+            <td id="tarifLembur"></td>
+            <td id="gajiLembur"></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><strong>Total Gaji</strong></td>
+            <td id="totalGaji"></td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <p><strong>Catatan:</strong><br>
+        Slip ini dibuat otomatis oleh sistem. Jika ada kesalahan, silakan konfirmasi ke Admin SDS Snack.
+      </p>
+
+      <button onclick="tutupSlip()">Tutup</button>
+      <button onclick="window.print()">Cetak</button>
+    </div>
+  </div>
+
+  <script>
+    const baseUrl = "https://script.google.com/macros/s/AKfycbw3Zwsok2TveD0gHkOg2xqsAJuv_WrSKEBWuocjnW_Hadn1TijCPTLj96rKoJexYZR_/exec";
+
+    async function loadNIPOptions() {
+      const res = await fetch(`${baseUrl}?action=allNIP`);
+      const data = await res.json();
+      const select = document.getElementById("nipSelect");
+      select.innerHTML = "";
+      data.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d.nip;
+        opt.textContent = `${d.nip} - ${d.nama}`;
+        select.appendChild(opt);
+      });
+    }
+
+    async function loadRekap() {
+      const res = await fetch(`${baseUrl}?action=allNIP`);
+      const nipList = await res.json();
+
+      const tbody = document.getElementById("rekapBody");
+      tbody.innerHTML = "";
+
+      let no = 1;
+      for (const data of nipList) {
+        const gajiRes = await fetch(`${baseUrl}?action=gaji&nip=${data.nip}`);
+        const gaji = await gajiRes.json();
+        const periode = document.getElementById("periodeSelect").value === "1" ? gaji.periode1 : gaji.periode2;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${no++}</td>
+          <td>${data.nip}</td>
+          <td>${data.nama}</td>
+          <td>${periode.jamNormal}</td>
+          <td>${periode.lembur}</td>
+          <td>${formatRupiah(periode.gajiPokok)}</td>
+          <td>${formatRupiah(periode.gajiLembur)}</td>
+          <td>${formatRupiah(periode.subtotal)}</td>
+          <td><button onclick="tampilkanSlip('${data.nip}', '${data.nama}')">Slip</button></td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    async function tampilkanSlip(nipParam = null, namaParam = null) {
+      const nip = nipParam || document.getElementById("nipSelect").value;
+      const nama = namaParam || (document.getElementById("nipSelect").selectedOptions[0]?.textContent.split(" - ")[1] || "Tim");
+      const periode = document.getElementById("periodeSelect").value;
+
+      const res = await fetch(`${baseUrl}?action=gaji&nip=${nip}`);
+      const data = await res.json();
+      const p = periode === "1" ? data.periode1 : data.periode2;
+
+      document.getElementById("namaTim").textContent = nama;
+      document.getElementById("idTim").textContent = nip;
+      document.getElementById("periodeText").textContent = p.tanggal;
+      document.getElementById("jamKerja").textContent = p.jamNormal;
+      document.getElementById("tarifNormal").textContent = formatRupiah(data.tarifNormal || 0);
+      document.getElementById("gajiPokok").textContent = formatRupiah(p.gajiPokok);
+      document.getElementById("jamLembur").textContent = p.lembur;
+      document.getElementById("tarifLembur").textContent = formatRupiah(data.tarifLembur || 0);
+      document.getElementById("gajiLembur").textContent = formatRupiah(p.gajiLembur);
+      document.getElementById("totalGaji").textContent = formatRupiah(p.subtotal);
+
+      document.getElementById("slipModal").classList.remove("hidden");
+    }
+
+    function tutupSlip() {
+      document.getElementById("slipModal").classList.add("hidden");
+    }
+
+    function formatRupiah(value) {
+      return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(value);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadNIPOptions();
+      loadRekap();
+      document.getElementById("periodeSelect").addEventListener("change", loadRekap);
+    });
+  </script>
+</body>
+</html>
