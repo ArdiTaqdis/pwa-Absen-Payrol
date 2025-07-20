@@ -57,6 +57,44 @@
       font-size: 1.2rem;
       font-weight: bold;
     }
+
+    /* Riwayat card */
+    .riwayat-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .riwayat-card {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+    .riwayat-card span.label {
+      font-weight: bold;
+      color: #555;
+    }
+    .badge {
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-align: center;
+      display: inline-block;
+    }
+    .badge.belum {
+      background: #ffebee;
+      color: #c62828;
+    }
+    .badge.lunas {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
   </style>
 </head>
 <body>
@@ -93,11 +131,15 @@
       <hr />
       <div class="total">Total Gaji: Rp <span id="totalGaji">0</span></div>
     </div>
+
+    <h3 style="text-align:center; margin-top: 2rem;">Riwayat Transaksi Gaji</h3>
+    <div id="riwayatGaji" class="riwayat-container">🔄 Memuat riwayat...</div>
   </div>
 
   <script>
     const nip = localStorage.getItem('nip');
     const nama = localStorage.getItem('nama') || "Tim SDS Snack";
+    const url = "https://script.google.com/macros/s/AKfycbxbhZdYC92Usks1voWorJ11c4oUbO0iDQ1O6jx949oFpjP2JQf9s3y2PPZRAqAyN4Qf/exec"; // GANTI
 
     if (!nip) {
       alert("Silakan login terlebih dahulu.");
@@ -106,37 +148,65 @@
       document.getElementById("idTeam").textContent = nip;
       document.getElementById("namaTeam").textContent = nama;
 
-      const url = "https://script.google.com/macros/s/AKfycby6M6v4XliWhvT8kHZKHPsWNRo4u-OOPPRRSTv6ZyZieqdEsOXWxqLtfye5BCaZRRQH/exec";
-
       fetch(`${url}?action=gaji&nip=${nip}`)
         .then(res => res.json())
         .then(data => {
           const p1 = data.periode1;
           const p2 = data.periode2;
 
-          // Periode 1
           document.getElementById('jamNormal1').textContent = p1.jamKerja || p1.jamNormal;
           document.getElementById('lembur1').textContent = p1.lembur;
           document.getElementById('gajiPokok1').textContent = formatRupiah(p1.gajiPokok);
           document.getElementById('gajiLembur1').textContent = formatRupiah(p1.gajiLembur);
           document.getElementById('subtotal1').textContent = formatRupiah(p1.subtotal);
 
-          // Periode 2
           document.getElementById('jamNormal2').textContent = p2.jamKerja || p2.jamNormal;
           document.getElementById('lembur2').textContent = p2.lembur;
           document.getElementById('gajiPokok2').textContent = formatRupiah(p2.gajiPokok);
           document.getElementById('gajiLembur2').textContent = formatRupiah(p2.gajiLembur);
           document.getElementById('subtotal2').textContent = formatRupiah(p2.subtotal);
 
-          // Total
           document.getElementById('totalGaji').textContent = formatRupiah(data.totalGaji);
-
           document.getElementById("loading").style.display = "none";
           document.getElementById("gajiBox").style.display = "block";
         })
         .catch(err => {
           console.error("Gagal ambil data:", err);
           alert("Gagal mengambil data gaji.");
+        });
+
+      // Load riwayat
+      fetch(`${url}?action=riwayatGaji&nip=${nip}`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById("riwayatGaji");
+          if (!data || data.length === 0) {
+            container.innerHTML = "📭 Belum ada riwayat gaji.";
+            return;
+          }
+          container.innerHTML = "";
+          data.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "riwayat-card";
+            const badgeClass = item.status.toLowerCase().includes("belum") ? "belum" : "lunas";
+
+            card.innerHTML = `
+              <div><span class="label">Periode:</span><br>${item.periode}</div>
+              <div><span class="label">Bulan:</span><br>${item.bulan}/${item.tahun}</div>
+              <div><span class="label">Jam:</span><br>${item.jam} jam</div>
+              <div><span class="label">Lembur:</span><br>${item.lembur} jam</div>
+              <div><span class="label">Pokok:</span><br>Rp ${formatRupiah(item.gajiPokok)}</div>
+              <div><span class="label">Lembur:</span><br>Rp ${formatRupiah(item.gajiLembur)}</div>
+              <div><span class="label">Total:</span><br><strong>Rp ${formatRupiah(item.subtotal)}</strong></div>
+              <div><span class="label">Status:</span><br><span class="badge ${badgeClass}">${item.status}</span></div>
+              <div><span class="label">Tanggal:</span><br>${item.timestamp}</div>
+            `;
+            container.appendChild(card);
+          });
+        })
+        .catch(err => {
+          console.error("❌ Gagal memuat riwayat gaji:", err);
+          document.getElementById("riwayatGaji").innerHTML = "⚠️ Gagal memuat data riwayat.";
         });
     }
 
