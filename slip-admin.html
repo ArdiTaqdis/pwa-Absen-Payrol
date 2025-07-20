@@ -185,6 +185,22 @@
     </div>
   </div>
 
+      <div id="toast" style="
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4caf50;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      display: none;
+      font-weight: bold;
+      z-index: 99999;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    ">Status berhasil disimpan.</div>
+
+
   <script>
     let currentNoWa = "";
     const baseUrl = "https://script.google.com/macros/s/AKfycbyHei8iwoXohpIUdzo2ksKI0Ovw7Q3kcZ4p7iF2_uWAJgeXHeUBUFFL9LqEX9DDxKcR/exec";
@@ -286,6 +302,17 @@
       return namaBulan[bulan - 1] || "";
     }
 
+    function showToast(message, color = "#4caf50") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.style.background = color;
+      toast.style.display = "block";
+      setTimeout(() => {
+        toast.style.display = "none";
+      }, 3000);
+    }
+
+
     async function simpanStatus() {
     const data = {
       action: "simpanStatusGaji",
@@ -310,9 +337,9 @@
 
     const result = await res.json();
     if (result.status === "success") {
-      alert("✅ Status berhasil disimpan.");
+      showToast("✅ Status berhasil disimpan.");
     } else {
-      alert("❌ Gagal menyimpan status: " + result.message);
+      showToast("❌ Gagal menyimpan status: " + result.message, "#f44336");
     }
   }
 
