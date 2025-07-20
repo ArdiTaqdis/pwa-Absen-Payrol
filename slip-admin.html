@@ -109,8 +109,12 @@
     </div>
   </div>
 
+  
+
   <script>
-    const baseUrl = "https://script.google.com/macros/s/AKfycbzp8JYSjyVaCHwkpzFqaT4Q0jaSpM45sHgnCxsTaBAee4259iQ_WaSXwmijwYhGbow7/exec"; // Ganti dengan URL Web App-mu
+    let currentNoWa = "";
+
+    const baseUrl = "https://script.google.com/macros/s/AKfycbz0i9HAs-BHnUfE6Jqneu0HOwBz6NY1NKtBUFMGuNDwaWFnK_gWlMh8EMCCRVqgEz9K/exec"; // Ganti dengan URL Web App-mu
 
     async function loadNIPOptions() {
       const res = await fetch(`${baseUrl}?action=allNIP`);
@@ -178,6 +182,8 @@
       document.getElementById("slipTotalGaji").textContent = formatRupiah(p.subtotal);
 
       document.getElementById("slipModal").classList.add("show");
+      currentNoWa = data.noWa || "";
+
     }
 
     function tutupSlip() {
@@ -188,21 +194,19 @@
       window.print();
     }
 
-    async function kirimWA() {
+    function kirimWA() {
       const nama = document.getElementById("slipNama").textContent;
       const nip = document.getElementById("slipNIP").textContent;
       const periode = document.getElementById("slipPeriode").textContent;
       const total = document.getElementById("slipTotalGaji").textContent;
       const status = document.getElementById("statusPembayaran").value;
 
-      const waRes = await fetch(`${baseUrl}?action=wa&nip=${nip}`);
-      const { noWa } = await waRes.json();
-
-      if (!noWa) return alert("Nomor WhatsApp tidak ditemukan.");
+      if (!currentNoWa) return alert("Nomor WhatsApp tidak ditemukan.");
 
       const pesan = `Slip Gaji SDS Snack\nNama: ${nama}\nNIP: ${nip}\nPeriode: ${periode}\nTotal Gaji: ${total}\nStatus: ${status}`;
-      window.open(`https://wa.me/${noWa}?text=${encodeURIComponent(pesan)}`, "_blank");
+      window.open(`https://wa.me/${currentNoWa}?text=${encodeURIComponent(pesan)}`, "_blank");
     }
+
 
     function getNamaBulan(bulan) {
       const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
