@@ -103,8 +103,8 @@
     <label>Tahun:</label>
     <select id="tahunSelect"></select>
 
-    <label>NIP:</label>
-    <select id="nipSelect"></select>
+    <!-- <label>NIP:</label>
+    <select id="nipSelect"></select> -->
 
     <label>Periode:</label>
     <select id="periodeSelect">
@@ -336,7 +336,9 @@
 
     const result = await res.json();
     if (result.status === "success") {
+        tutupSlip(); //
       showToast("✅ Status berhasil disimpan.");
+
     } else {
       showToast("❌ Gagal menyimpan status: " + result.message, "#f44336");
     }

@@ -6,96 +6,107 @@
   <title>Gaji Tim SDS Snack</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 2rem;
-      background-color: #f4f4f4;
-    }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      background: #fff;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-    .info {
-      font-size: 1rem;
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-    .periode-box {
-      background-color: #e3f2fd;
-      padding: 1.5rem;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
-    }
-    .periode-box p {
-      margin: 0.4rem 0;
-    }
-    .label {
-      font-weight: bold;
-    }
-    .back {
-      margin-bottom: 1.5rem;
-      display: inline-block;
-      text-decoration: none;
-      background: #2196f3;
-      color: white;
-      padding: 0.6rem 1rem;
-      border-radius: 5px;
-    }
-    hr {
-      margin: 1rem 0;
-    }
-    .total {
-      text-align: center;
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    padding: 2rem;
+    background-color: #f4f4f4;
+  }
+  .container {
+    max-width: 600px;
+    margin: auto;
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #6a1b9a;
+  }
+  .info {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+  .periode-box {
+    background: #f3e5f5; /* ungu muda */
+    border-left: 6px solid #7b1fa2; /* ungu gelap */
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+  .periode-box h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: #6a1b9a;
+  }
+  .periode-box p {
+    margin: 0.3rem 0;
+    line-height: 1.4;
+  }
+  .label {
+    font-weight: bold;
+  }
+  .back {
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    text-decoration: none;
+    background: #7b1fa2;
+    color: white;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+  }
+  hr {
+    margin: 1rem 0;
+  }
+  .total {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #4a148c;
+  }
 
-    /* Riwayat card */
-    .riwayat-container {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-    .riwayat-card {
-      background: #fff;
-      padding: 1rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 0.5rem;
-      font-size: 0.9rem;
-    }
-    .riwayat-card span.label {
-      font-weight: bold;
-      color: #555;
-    }
-    .badge {
-      padding: 0.3rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: bold;
-      text-align: center;
-      display: inline-block;
-    }
-    .badge.belum {
-      background: #ffebee;
-      color: #c62828;
-    }
-    .badge.lunas {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-  </style>
+  /* Riwayat card */
+  .riwayat-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .riwayat-card {
+    background: #fff;
+    padding: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  .riwayat-card span.label {
+    font-weight: bold;
+    color: #555;
+  }
+  .badge {
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+  }
+  .badge.belum {
+    background: #ffebee;
+    color: #c62828;
+  }
+  .badge.lunas {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+</style>
+
 </head>
 <body>
   <div class="container">
