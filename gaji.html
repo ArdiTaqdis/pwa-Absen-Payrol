@@ -139,7 +139,7 @@
   <script>
     const nip = localStorage.getItem('nip');
     const nama = localStorage.getItem('nama') || "Tim SDS Snack";
-    const url = "https://script.google.com/macros/s/AKfycbzXgLkOHepD1Lub15rkN6G1ZCTaRIN_TZcqypIOSCsF_-YOQ1iyTw6sR_McH-yEJosq/exec"; // GANTI
+    const url = "https://script.google.com/macros/s/AKfycbymLoPFLf8-U5XHdhEEJlsEU5vBHRiv1T_aF2oUgpmGU_OWS54G9LiSwxGZKOKN5h2B/exec"; // GANTI
 
     if (!nip) {
       alert("Silakan login terlebih dahulu.");
@@ -148,7 +148,12 @@
       document.getElementById("idTeam").textContent = nip;
       document.getElementById("namaTeam").textContent = nama;
 
-      fetch(`${url}?action=gaji&nip=${nip}`)
+      const today = new Date();
+      const bulan = today.getMonth() + 1;
+      const tahun = today.getFullYear();
+      console.log("📦 Kirim ke backend:", nip, bulan, tahun);
+      fetch(`${url}?action=gaji&nip=${nip}&bulan=${bulan}&tahun=${tahun}`)
+      
         .then(res => res.json())
         .then(data => {
           console.log("✅ Data Gaji:", data);
