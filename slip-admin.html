@@ -250,50 +250,51 @@
       document.getElementById("totalSemuaGaji").textContent = formatRupiah(total);
     }
 
-    async function tampilkanSlip(nip, nama) {
-      const periode = document.getElementById("periodeSelect").value;
-      const bulan = document.getElementById("bulanSelect").value;
-      const tahun = document.getElementById("tahunSelect").value;
+    // Di dalam fungsi tampilkanSlip()
+      async function tampilkanSlip(nip, nama) {
+        const periode = document.getElementById("periodeSelect").value;
+        const bulan = document.getElementById("bulanSelect").value;
+        const tahun = document.getElementById("tahunSelect").value;
 
-      const res = await fetch(`${baseUrl}?action=gaji&nip=${nip}&bulan=${bulan}&tahun=${tahun}`);
-      const data = await res.json();
-      const p = periode === "1" ? data.periode1 : data.periode2;
+        const res = await fetch(`${baseUrl}?action=gaji&nip=${nip}&bulan=${bulan}&tahun=${tahun}`);
+        const data = await res.json();
+        const p = periode === "1" ? data.periode1 : data.periode2;
 
-      document.getElementById("slipNama").textContent = nama;
-      document.getElementById("slipNIP").textContent = nip;
-      document.getElementById("slipPeriode").textContent = `${p.tanggal} ${getNamaBulan(bulan)} ${tahun}`;
-      document.getElementById("slipJamKerja").textContent = p.jamNormal;
-      document.getElementById("slipTarifKerja").textContent = formatRupiah(data.tarifNormal || 0);
-      document.getElementById("slipGajiPokok").textContent = formatRupiah(p.gajiPokok);
-      document.getElementById("slipJamLembur").textContent = p.lembur;
-      document.getElementById("slipTarifLembur").textContent = formatRupiah(data.tarifLembur || 0);
-      document.getElementById("slipGajiLembur").textContent = formatRupiah(p.gajiLembur);
-      document.getElementById("slipTotalGaji").textContent = formatRupiah(p.subtotal);
+        document.getElementById("slipNama").textContent = nama;
+        document.getElementById("slipNIP").textContent = nip;
+        document.getElementById("slipPeriode").textContent = `${p.tanggal} ${getNamaBulan(bulan)} ${tahun}`;
+        document.getElementById("slipJamKerja").textContent = p.jamNormal;
+        document.getElementById("slipTarifKerja").textContent = formatRupiah(data.tarifNormal || 0);
+        document.getElementById("slipGajiPokok").textContent = formatRupiah(p.gajiPokok);
+        document.getElementById("slipJamLembur").textContent = p.lembur;
+        document.getElementById("slipTarifLembur").textContent = formatRupiah(data.tarifLembur || 0);
+        document.getElementById("slipGajiLembur").textContent = formatRupiah(p.gajiLembur);
+        document.getElementById("slipTotalGaji").textContent = formatRupiah(p.subtotal);
 
-      currentNoWa = data.noWa || "";
-      document.getElementById("slipModal").classList.add("show");
+        currentNoWa = data.noWa || "";
+        document.getElementById("slipModal").classList.add("show");
 
-      // Ambil status pembayaran dari sheet RekapGaji
-      const statusRes = await fetch(`${baseUrl}?action=getStatusGaji&nip=${nip}&periode=${periode}&bulan=${bulan}&tahun=${tahun}`);
-      const statusData = await statusRes.json();
-      const status = statusData.status || "Belum Dibayarkan";
+        // Ambil status pembayaran dari sheet RekapGaji
+        try {
+          const statusRes = await fetch(`${baseUrl}?action=getStatusGaji&nip=${nip}&periode=${periode}&bulan=${bulan}&tahun=${tahun}`);
+          const statusData = await statusRes.json();
+          const status = statusData.status || "Belum Dibayarkan";
 
-      const statusSelect = document.getElementById("statusPembayaran");
-      statusSelect.value = status;
+          const statusSelect = document.getElementById("statusPembayaran");
+          statusSelect.value = status === "Sudah Dibayarkan" ? "Sudah Dibayarkan" : "Belum Dibayarkan";
 
-      // Jika sudah dibayarkan, disable dropdown dan tombol simpan
-      const simpanBtn = document.querySelector("button[onclick='simpanStatus()']");
-      if (status === "Sudah Dibayarkan") {
-        statusSelect.disabled = true;
-        simpanBtn.disabled = true;
-        simpanBtn.style.opacity = 0.6;
-      } else {
-        statusSelect.disabled = false;
-        simpanBtn.disabled = false;
-        simpanBtn.style.opacity = 1;
+          // Cek dan set status tombol
+          const simpanBtn = document.querySelector("button[onclick='simpanStatus()']");
+          const isSudah = statusSelect.value === "Sudah Dibayarkan";
+          statusSelect.disabled = isSudah;
+          simpanBtn.disabled = isSudah;
+          simpanBtn.style.opacity = isSudah ? 0.6 : 1;
+
+          console.log("✅ Status diterapkan:", statusSelect.value);
+        } catch (err) {
+          console.error("❌ Gagal ambil status:", err);
+        }
       }
-
-    }
 
     function tutupSlip() {
       document.getElementById("slipModal").classList.remove("show");
