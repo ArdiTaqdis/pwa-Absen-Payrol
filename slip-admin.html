@@ -239,50 +239,31 @@
       document.getElementById("totalSemuaGaji").textContent = formatRupiah(total);
     }
 
-    async function tampilkanSlip(nip, nama) {
-      const periode = document.getElementById("periodeSelect").value;
-      const bulan = document.getElementById("bulanSelect").value;
-      const tahun = document.getElementById("tahunSelect").value;
+    async function tampilkanSlip(nip, nama, bulan, tahun, periode) {
+  document.getElementById("slipNama").textContent = nama;
+  document.getElementById("slipNIP").textContent = nip;
+  const periodeLabel = getPeriodeString(periode);
+  document.getElementById("slipPeriode").textContent = `${periodeLabel} ${bulanToNama(bulan)} ${tahun}`;
 
-      const res = await fetch(`${baseUrl}?action=gaji&nip=${nip}&bulan=${bulan}&tahun=${tahun}`);
-      const data = await res.json();
-      const p = periode === "1" ? data.periode1 : data.periode2;
+  const baseUrl = "https://script.google.com/macros/s/AKfycbzh-tedpCBifgWmQ206H0hn-BDegmKPFBnjLYDibiNQHfOzhPvW0mBKNXkK1A6oM0sr/exec"; // sesuaikan dengan URL kamu
 
-      document.getElementById("slipNama").textContent = nama;
-      document.getElementById("slipNIP").textContent = nip;
-      document.getElementById("slipPeriode").textContent = `${p.tanggal} ${getNamaBulan(bulan)} ${tahun}`;
-      document.getElementById("slipJamKerja").textContent = p.jamNormal;
-      document.getElementById("slipTarifKerja").textContent = formatRupiah(data.tarifNormal || 0);
-      document.getElementById("slipGajiPokok").textContent = formatRupiah(p.gajiPokok);
-      document.getElementById("slipJamLembur").textContent = p.lembur;
-      document.getElementById("slipTarifLembur").textContent = formatRupiah(data.tarifLembur || 0);
-      document.getElementById("slipGajiLembur").textContent = formatRupiah(p.gajiLembur);
-      document.getElementById("slipTotalGaji").textContent = formatRupiah(p.subtotal);
+  const statusRes = await fetch(`${baseUrl}?action=getStatusGaji&nip=${nip}&periode=${encodeURIComponent(periodeLabel)}&bulan=${bulan}&tahun=${tahun}`);
+  const statusData = await statusRes.json();
+  console.log("📦 Status dari API:", statusData);
 
-      currentNoWa = data.noWa || "";
-      document.getElementById("slipModal").classList.add("show");
+  const statusDropdown = document.getElementById("statusPembayaran");
+  if (statusData.status === "Sudah Dibayarkan") {
+    statusDropdown.value = "Sudah Dibayarkan";
+    statusDropdown.disabled = true;
+    document.querySelector("button[onclick='simpanStatus()']").disabled = true;
+  } else {
+    statusDropdown.value = "Belum Dibayarkan";
+    statusDropdown.disabled = false;
+    document.querySelector("button[onclick='simpanStatus()']").disabled = false;
+  }
 
-      // Ambil status pembayaran dari sheet RekapGaji
-      const statusRes = await fetch(`${baseUrl}?action=getStatusGaji&nip=${nip}&periode=${periode}&bulan=${bulan}&tahun=${tahun}`);
-      const statusData = await statusRes.json();
-      const status = statusData.status || "Belum Dibayarkan";
-
-      const statusSelect = document.getElementById("statusPembayaran");
-       statusSelect.value = status === "Sudah Dibayarkan" ? "Sudah Dibayarkan" : "Belum Dibayarkan";
-
-      // Jika sudah dibayarkan, disable dropdown dan tombol simpan
-      const simpanBtn = document.querySelector("button[onclick='simpanStatus()']");
-      if (status === "Sudah Dibayarkan") {
-        statusSelect.disabled = true;
-        simpanBtn.disabled = true;
-        simpanBtn.style.opacity = 0.6;
-      } else {
-        statusSelect.disabled = false;
-        simpanBtn.disabled = false;
-        simpanBtn.style.opacity = 1;
-      }
-
-    }
+  document.getElementById("slipModal").style.display = "block";
+}
 
     function tutupSlip() {
       document.getElementById("slipModal").classList.remove("show");
@@ -326,7 +307,7 @@
     data.append("action", "simpanStatusGaji");
     data.append("nip", document.getElementById("slipNIP").textContent);
     data.append("nama", document.getElementById("slipNama").textContent);
-    data.append("periode", document.getElementById("slipPeriode").textContent.split(" ")[0]); // contoh: "1–15"
+    data.append("periode", document.getElementById("periodeSelect").value); // contoh: "1–15"
     data.append("bulan", document.getElementById("bulanSelect").value);
     data.append("tahun", document.getElementById("tahunSelect").value);
     data.append("jamKerja", document.getElementById("slipJamKerja").textContent);
@@ -356,14 +337,16 @@
 
 
   function getAngka(rupiah) {
-  const clean = rupiah
-    .replace(/[Rp\s]/g, '')     // hapus Rp dan spasi
-    .replace(/\./g, '')         // hapus titik ribuan
-    .replace(',', '.');         // ubah koma jadi titik
-  return Math.round(parseFloat(clean)) || 0;
+    const clean = rupiah
+      .replace(/[Rp\s]/g, '')     // hapus Rp dan spasi
+      .replace(/\./g, '')         // hapus titik ribuan
+      .replace(',', '.');         // ubah koma jadi titik
+    return Math.round(parseFloat(clean)) || 0;
+  }
+
+  function getPeriodeString(val) {
+  return val === "1" ? "1–15" : "16–31";
 }
-
-
 
     function formatRupiah(value) {
       return new Intl.NumberFormat("id-ID", { style: 'currency', currency: 'IDR' }).format(value);
