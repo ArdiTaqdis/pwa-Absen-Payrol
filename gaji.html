@@ -151,6 +151,7 @@
       fetch(`${url}?action=gaji&nip=${nip}`)
         .then(res => res.json())
         .then(data => {
+          console.log("✅ Data Gaji:", data);
           const p1 = data.periode1;
           const p2 = data.periode2;
 

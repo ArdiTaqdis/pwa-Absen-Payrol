@@ -344,8 +344,13 @@
 
 
   function getAngka(rupiah) {
-    return parseInt(rupiah.replace(/[^0-9]/g, '')) || 0;
-  }
+  const clean = rupiah
+    .replace(/[Rp\s]/g, '')     // hapus Rp dan spasi
+    .replace(/\./g, '')         // hapus titik ribuan
+    .replace(',', '.');         // ubah koma jadi titik
+  return Math.round(parseFloat(clean)) || 0;
+}
+
 
 
     function formatRupiah(value) {
