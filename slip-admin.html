@@ -203,7 +203,7 @@
 
   <script>
     let currentNoWa = "";
-    const baseUrl = "https://script.google.com/macros/s/AKfycbz8_kdCkVLQjq_-P9jNZw6pktNO5Yw2e-UPJIqOrwmJRRs6FRsTCcx9WztwkHN8NCTR/exec";
+    const baseUrl = "https://script.google.com/macros/s/AKfycbzJ40reGT8CK-FtfCJLEkEP1bHM4bMrk4CuVqFFshPLN-9sqMGNgyRZ5qfhjDrgZxsw/exec";
 
     async function loadNIPOptions() {
       const res = await fetch(`${baseUrl}?action=allNIP`);
@@ -272,6 +272,27 @@
 
       currentNoWa = data.noWa || "";
       document.getElementById("slipModal").classList.add("show");
+
+      // Ambil status pembayaran dari sheet RekapGaji
+      const statusRes = await fetch(`${baseUrl}?action=getStatusGaji&nip=${nip}&periode=${periode}&bulan=${bulan}&tahun=${tahun}`);
+      const statusData = await statusRes.json();
+      const status = statusData.status || "Belum Dibayarkan";
+
+      const statusSelect = document.getElementById("statusPembayaran");
+      statusSelect.value = status;
+
+      // Jika sudah dibayarkan, disable dropdown dan tombol simpan
+      const simpanBtn = document.querySelector("button[onclick='simpanStatus()']");
+      if (status === "Sudah Dibayarkan") {
+        statusSelect.disabled = true;
+        simpanBtn.disabled = true;
+        simpanBtn.style.opacity = 0.6;
+      } else {
+        statusSelect.disabled = false;
+        simpanBtn.disabled = false;
+        simpanBtn.style.opacity = 1;
+      }
+
     }
 
     function tutupSlip() {
