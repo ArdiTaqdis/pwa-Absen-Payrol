@@ -279,7 +279,7 @@
       const status = statusData.status || "Belum Dibayarkan";
 
       const statusSelect = document.getElementById("statusPembayaran");
-      statusSelect.value = status;
+       statusSelect.value = status === "Sudah Dibayarkan" ? "Sudah Dibayarkan" : "Belum Dibayarkan";
 
       // Jika sudah dibayarkan, disable dropdown dan tombol simpan
       const simpanBtn = document.querySelector("button[onclick='simpanStatus()']");
