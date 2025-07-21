@@ -247,5 +247,43 @@
         });      
     }
   </script>
+
+  <button onclick="ujiKirim()" style="margin-top: 1rem; padding: 10px 16px; background: #4caf50; color: white; border: none; border-radius: 6px;">
+  🧪 Test Kirim Data ke Server
+</button>
+<script>
+  function ujiKirim() {
+    const data = {
+      nip: "001",
+      nama: "Tes User",
+      tanggal: new Date().toLocaleDateString('id-ID'),
+      jam: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+      jenis: "Masuk",
+      lokasi: "0,0",
+      qrCode: "001-SDS Snack"
+    };
+
+    fetch("https://script.google.com/macros/s/AKfycby3LdLdFZAbWOuvGlEUKlzGdNkuqInf46ZghUC4cRBuaDfrY5FhHnhCIG7t0y3zIZcv/exec", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams(data)
+    })
+    .then(res => {
+      console.log("📥 Response RAW:", res);
+      return res.json();
+    })
+    .then(res => {
+      console.log("✅ Parsed Response:", res);
+      alert("✅ Response: " + JSON.stringify(res));
+    })
+    .catch(err => {
+      console.error("❌ ERROR:", err);
+      alert("❌ Gagal konek: " + err.message);
+    });
+  }
+</script>
+
 </body>
 </html>
