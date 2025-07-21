@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Home - SDS Snack</title>
-  <meta name="theme-color" content="#8067eb">
-  <link rel="manifest" href="manifest.json">
   <style>
     :root {
       --mint: #8067eb;
@@ -13,48 +11,108 @@
       --choco: #7c6ca8;
       --bg: #fefdfc;
     }
+
     * {
       box-sizing: border-box;
     }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: var(--bg);
       color: #333;
     }
+
     .wave {
       background: var(--mint);
-      padding: 2rem 1rem 4rem;
+      padding: 4rem 1rem 6rem;
       color: white;
-      border-bottom-left-radius: 40% 10%;
-      border-bottom-right-radius: 40% 10%;
+      border-radius: 0 0 40% 10% / 0 0 10% 10%;
+      position: relative;
+      overflow: hidden;
       text-align: center;
     }
-    .wave img {
-      width: 60px;
-      height: 60px;
-      margin-bottom: 10px;
+
+    .wave::after, .wave::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 80px;
+      left: 0;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: bottom center;
+      z-index: 1;
     }
-    .wave h1 {
+
+    /* Wave bawah */
+    .wave::after {
+      bottom: 0;
+      background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 1440 320' xmlns='http://www.w3.org/2000/svg'><path fill='%23ffffff' fill-opacity='0.4' d='M0,224L60,202.7C120,181,240,139,360,138.7C480,139,600,181,720,192C840,203,960,181,1080,154.7C1200,128,1320,96,1380,80L1440,64L1440,320L0,320Z'/></svg>");
+    }
+
+    /* Wave atas */
+    .wave::before {
+      top: 0;
+      background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 1440 320' xmlns='http://www.w3.org/2000/svg'><path fill='%23ffffff' fill-opacity='0.4' d='M0,160L60,133.3C120,107,240,53,360,69.3C480,85,600,171,720,192C840,213,960,171,1080,122.7C1200,75,1320,21,1380,0L1440,0L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z'/></svg>");
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+      z-index: 2;
+      margin-bottom: 1rem;
+    }
+
+    .logo-kecil {
+      width: 40px;
+    }
+
+    .brand-text {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .nama-user,
+    .id-user {
+      font-size: 0.75rem;
+      opacity: 0.85;
       margin: 0;
-      font-size: 1.5rem;
+      position: relative;
+      z-index: 2;
     }
-    .wave p {
-      margin: 4px 0 0;
-      font-size: 0.9rem;
-      opacity: 0.9;
+
+    .koki-dekor {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 220px;
+      pointer-events: none;
+      z-index: 0;
+      transform: translate(20%, 10%);
+      opacity: 1;
     }
 
     .container {
-      margin-top: -1rem;
-      padding: 2.5rem;
+      margin-top: -2rem;
+      padding: 3.5rem 1.5rem 2rem;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: var(--choco);
     }
 
     .grid-menu {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
-      margin: 1rem 0 2rem;
+      margin-bottom: 2rem;
     }
 
     .menu-item {
@@ -65,13 +123,13 @@
       color: #fff;
       font-weight: 600;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: 0.2s;
       cursor: pointer;
+      transition: 0.2s;
     }
 
     .menu-item:hover {
       transform: scale(1.03);
-      background: #ffb3c1;
+      background: #b79eff;
     }
 
     .menu-item .icon {
@@ -79,16 +137,9 @@
       margin-bottom: 6px;
     }
 
-    .section-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-      color: var(--choco);
-    }
-
     .bottom-actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
     }
 
@@ -100,12 +151,6 @@
     .logout {
       margin-top: 2rem;
       text-align: center;
-    }
-
-       .menu-item.disabled {
-      opacity: 0.6;
-      pointer-events: none;
-      cursor: not-allowed;
     }
 
     .logout button {
@@ -126,10 +171,13 @@
 <body>
 
   <div class="wave">
-    <img src="logo.png" alt="Logo SDS Snack" />
-    <h1>SDS Snack</h1>
-    <p id="namaTeam">Nama Tim</p>
-    <small>ID Tim: <span id="idTeam"></span></small>
+    <div class="brand">
+      <img src="logo.png" alt="Logo SDS Snack" class="logo-kecil" />
+      <span class="brand-text">SDS Snack</span>
+    </div>
+    <p class="nama-user" id="namaTeam">Fitri Wahyuningsih</p>
+    <p class="id-user">ID Tim: <span id="idTeam">10001</span></p>
+    <img src="koki-sds-transparan.png" alt="Koki SDS Snack" class="koki-dekor" />
   </div>
 
   <div class="container">
@@ -148,7 +196,7 @@
           <div class="icon">💰</div>
           <div>Gaji</div>
         </div>
-        <div class="menu-item" id="adminMenu" onclick="goToAdmin()">
+        <div class="menu-item" onclick="goToAdmin()">
           <div class="icon">📋</div>
           <div>Admin</div>
         </div>
@@ -158,11 +206,12 @@
     <div>
       <div class="section-title">Lainnya</div>
       <div class="bottom-actions">
-        <div class="menu-item" onclick="location.href='kasir.html'">
+        
+        <div class="menu-item" onclick="location.href='#'">
           <div class="icon">🛒</div>
           <div>Kasir</div>
         </div>
-        <div class="menu-item" onclick="location.href='pesanan.html'">
+        <div class="menu-item" onclick="location.href='#'">
           <div class="icon">📦</div>
           <div>Pesanan</div>
         </div>
@@ -173,6 +222,8 @@
       <button onclick="logout()">🔒 Logout</button>
     </div>
   </div>
+
+  
 
   <script>
     const nip = localStorage.getItem('nip');
@@ -192,15 +243,9 @@
     }
 
     function goToForm() {
-      const btn = event.target;
-      btn.disabled = true;
       const nama = encodeURIComponent(localStorage.getItem('nama') || '');
       window.location.href = `form.html?nip=${nip}&nama=${nama}`;
     }
-
-    if (localStorage.getItem("role") !== "admin") {
-        document.getElementById("adminMenu").classList.add("disabled");
-      }
 
     function goToAdmin() {
       const role = localStorage.getItem("role");
@@ -210,7 +255,7 @@
         alert("⛔ Hanya admin yang bisa mengakses halaman ini.");
       }
     }
-
   </script>
+
 </body>
 </html>

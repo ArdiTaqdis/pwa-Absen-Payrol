@@ -265,10 +265,7 @@
       // Ambil status pembayaran dari sheet RekapGaji
       const statusRes = await fetch(`${baseUrl}?action=getStatusGaji&nip=${nip}&periode=${periode}&bulan=${bulan}&tahun=${tahun}`);
       const statusData = await statusRes.json();
-      console.log("📦 Status dari API:", statusData);
-
       const status = statusData.status || "Belum Dibayarkan";
-
 
       const statusSelect = document.getElementById("statusPembayaran");
        statusSelect.value = status === "Sudah Dibayarkan" ? "Sudah Dibayarkan" : "Belum Dibayarkan";
@@ -329,7 +326,7 @@
     data.append("action", "simpanStatusGaji");
     data.append("nip", document.getElementById("slipNIP").textContent);
     data.append("nama", document.getElementById("slipNama").textContent);
-    data.append("periode", document.getElementById("periodeSelect").value); // contoh: "1–15"
+    data.append("periode", document.getElementById("slipPeriode").textContent.split(" ")[0]); // contoh: "1–15"
     data.append("bulan", document.getElementById("bulanSelect").value);
     data.append("tahun", document.getElementById("tahunSelect").value);
     data.append("jamKerja", document.getElementById("slipJamKerja").textContent);
@@ -359,16 +356,14 @@
 
 
   function getAngka(rupiah) {
-    const clean = rupiah
-      .replace(/[Rp\s]/g, '')     // hapus Rp dan spasi
-      .replace(/\./g, '')         // hapus titik ribuan
-      .replace(',', '.');         // ubah koma jadi titik
-    return Math.round(parseFloat(clean)) || 0;
-  }
-
-  function getPeriodeString(val) {
-  return val === "1" ? "1–15" : "16–31";
+  const clean = rupiah
+    .replace(/[Rp\s]/g, '')     // hapus Rp dan spasi
+    .replace(/\./g, '')         // hapus titik ribuan
+    .replace(',', '.');         // ubah koma jadi titik
+  return Math.round(parseFloat(clean)) || 0;
 }
+
+
 
     function formatRupiah(value) {
       return new Intl.NumberFormat("id-ID", { style: 'currency', currency: 'IDR' }).format(value);
