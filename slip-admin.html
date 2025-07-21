@@ -205,18 +205,6 @@
     let currentNoWa = "";
     const baseUrl = "https://script.google.com/macros/s/AKfycbzJ40reGT8CK-FtfCJLEkEP1bHM4bMrk4CuVqFFshPLN-9sqMGNgyRZ5qfhjDrgZxsw/exec";
 
-    async function loadNIPOptions() {
-      const res = await fetch(`${baseUrl}?action=allNIP`);
-      const data = await res.json();
-      const nipSelect = document.getElementById("nipSelect");
-      nipSelect.innerHTML = "";
-      data.forEach(d => {
-        const opt = document.createElement("option");
-        opt.value = d.nip;
-        opt.textContent = `${d.nip} - ${d.nama}`;
-        nipSelect.appendChild(opt);
-      });
-    }
 
     async function loadRekap() {
       const periode = document.getElementById("periodeSelect").value;
@@ -381,7 +369,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      loadNIPOptions();
+      
       const tahunSelect = document.getElementById("tahunSelect");
       const bulanSelect = document.getElementById("bulanSelect");
       const now = new Date();
