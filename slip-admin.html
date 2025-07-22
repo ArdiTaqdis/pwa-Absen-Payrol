@@ -2,6 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
+  <meta name="theme-color" content="#8067eb">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Slip Gaji - Tim SDS Snack</title>
   <style>
@@ -321,7 +322,14 @@
     }
 
 
-    async function simpanStatus() {
+   async function simpanStatus() {
+  const status = document.getElementById("statusPembayaran").value;
+
+  if (status === "Belum Dibayarkan") {
+    alert("❌ Status masih 'Belum Dibayarkan'.\nSilakan ubah ke 'Sudah Dibayarkan' sebelum menyimpan.");
+    return; // Hentikan proses simpan
+  }
+
   const data = new URLSearchParams();
   data.append("action", "simpanStatusGaji");
   data.append("nip", document.getElementById("slipNIP").textContent);
@@ -334,7 +342,7 @@
   data.append("gajiPokok", getAngka(document.getElementById("slipGajiPokok").textContent));
   data.append("gajiLembur", getAngka(document.getElementById("slipGajiLembur").textContent));
   data.append("subtotal", getAngka(document.getElementById("slipTotalGaji").textContent));
-  data.append("status", document.getElementById("statusPembayaran").value);
+  data.append("status", status);
 
   try {
     const res = await fetch(baseUrl, {
@@ -347,11 +355,10 @@
 
     let result = {};
     try {
-      result = await res.json(); // coba parse json
+      result = await res.json();
     } catch (jsonErr) {
-      // jika tidak bisa parse, mungkin kena CORS
-      console.warn("⚠️ Tidak bisa baca JSON (CORS?):", jsonErr.message);
-      showToast("⚠️ Data mungkin sudah tersimpan (CORS error).", "#ff9800");
+      console.warn("⚠️ Tidak bisa parse JSON (CORS?):", jsonErr.message);
+      showToast("⚠️ Mungkin berhasil, tapi gagal membaca balasan server (CORS).", "#ff9800");
       tutupSlip();
       return;
     }
@@ -363,7 +370,7 @@
     }
 
   } catch (err) {
-    console.error("❌ Gagal kirim:", err.message);
+    console.error("❌ Error:", err.message);
     if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
       showToast("⚠️ Mungkin berhasil, tapi gagal membaca balasan server (CORS).", "#ff9800");
     } else {
@@ -373,6 +380,7 @@
     tutupSlip();
   }
 }
+
 
 
   function getAngka(rupiah) {
