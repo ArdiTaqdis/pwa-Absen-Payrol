@@ -343,6 +343,7 @@
       },
       body: data
     });
+    tutupSlip();
 
     const result = await res.json();
     if (result.status === "success") {
@@ -352,7 +353,7 @@
     } else {
       showToast("❌ Gagal menyimpan status: " + result.message, "#f44336");
     }
-    tutupSlip();
+    
   }
 
 
