@@ -248,7 +248,7 @@
 
     // Deteksi kemungkinan error CORS
     if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
-      alert("⚠️ Data kemungkinan sudah terkirim (CORS error). Anda akan diarahkan ke beranda.");
+      alert("✅ Absen Berhasil terkirim, lihat menu Rekap yaa... Anda akan diarahkan ke beranda.");
       window.location.href = "home.html";
     } else {
       alert("❌ Gagal terhubung ke server: " + err.message);

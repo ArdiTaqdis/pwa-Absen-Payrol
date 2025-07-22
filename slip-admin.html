@@ -322,20 +322,21 @@
 
 
     async function simpanStatus() {
-    const data = new URLSearchParams();
-    data.append("action", "simpanStatusGaji");
-    data.append("nip", document.getElementById("slipNIP").textContent);
-    data.append("nama", document.getElementById("slipNama").textContent);
-    data.append("periode", document.getElementById("slipPeriode").textContent.split(" ")[0]); // contoh: "1–15"
-    data.append("bulan", document.getElementById("bulanSelect").value);
-    data.append("tahun", document.getElementById("tahunSelect").value);
-    data.append("jamKerja", document.getElementById("slipJamKerja").textContent);
-    data.append("lembur", document.getElementById("slipJamLembur").textContent);
-    data.append("gajiPokok", getAngka(document.getElementById("slipGajiPokok").textContent));
-    data.append("gajiLembur", getAngka(document.getElementById("slipGajiLembur").textContent));
-    data.append("subtotal", getAngka(document.getElementById("slipTotalGaji").textContent));
-    data.append("status", document.getElementById("statusPembayaran").value);
+  const data = new URLSearchParams();
+  data.append("action", "simpanStatusGaji");
+  data.append("nip", document.getElementById("slipNIP").textContent);
+  data.append("nama", document.getElementById("slipNama").textContent);
+  data.append("periode", document.getElementById("slipPeriode").textContent.split(" ")[0]);
+  data.append("bulan", document.getElementById("bulanSelect").value);
+  data.append("tahun", document.getElementById("tahunSelect").value);
+  data.append("jamKerja", document.getElementById("slipJamKerja").textContent);
+  data.append("lembur", document.getElementById("slipJamLembur").textContent);
+  data.append("gajiPokok", getAngka(document.getElementById("slipGajiPokok").textContent));
+  data.append("gajiLembur", getAngka(document.getElementById("slipGajiLembur").textContent));
+  data.append("subtotal", getAngka(document.getElementById("slipTotalGaji").textContent));
+  data.append("status", document.getElementById("statusPembayaran").value);
 
+  try {
     const res = await fetch(baseUrl, {
       method: "POST",
       headers: {
@@ -343,18 +344,35 @@
       },
       body: data
     });
-    tutupSlip();
 
-    const result = await res.json();
+    let result = {};
+    try {
+      result = await res.json(); // coba parse json
+    } catch (jsonErr) {
+      // jika tidak bisa parse, mungkin kena CORS
+      console.warn("⚠️ Tidak bisa baca JSON (CORS?):", jsonErr.message);
+      showToast("⚠️ Data mungkin sudah tersimpan (CORS error).", "#ff9800");
+      tutupSlip();
+      return;
+    }
+
     if (result.status === "success") {
-        tutupSlip(); //
       showToast("✅ Status berhasil disimpan.");
-
     } else {
       showToast("❌ Gagal menyimpan status: " + result.message, "#f44336");
     }
-    
+
+  } catch (err) {
+    console.error("❌ Gagal kirim:", err.message);
+    if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
+      showToast("⚠️ Mungkin berhasil, tapi gagal membaca balasan server (CORS).", "#ff9800");
+    } else {
+      showToast("❌ Gagal koneksi: " + err.message, "#f44336");
+    }
+  } finally {
+    tutupSlip();
   }
+}
 
 
   function getAngka(rupiah) {
