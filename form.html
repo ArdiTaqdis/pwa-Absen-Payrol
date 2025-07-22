@@ -168,7 +168,10 @@
         .catch(() => {
           document.getElementById("lokasi").textContent = "Tidak bisa membaca lokasi.";
         });
+    }, () => {
+      document.getElementById("lokasi").textContent = "Belum aktif";
     });
+
 
     let scanner;
 
@@ -206,23 +209,30 @@
     }
 
     function kirimAbsen() {
-  const qrCode = localStorage.getItem("qrCode") || "";
-  if (!qrCode || qrCode !== "001-SDS Snack") {
-    alert("❌ QR Code tidak valid. Scan ulang.");
-    return;
-  }
+    const lokasi = document.getElementById("lokasi").textContent;
+    const qrCode = localStorage.getItem("qrCode") || "";
 
-  const data = {
-    nip,
-    nama,
-    tanggal: document.getElementById("tanggal").textContent,
-    jam: document.getElementById("jam").textContent,
-    jenis: document.getElementById("jenis").textContent,
-    lokasi: document.getElementById("lokasi").textContent,
-    qrCode
-  };
+    if (lokasi === "Belum aktif" || lokasi.includes("Memuat") || lokasi.includes("Tidak bisa")) {
+      alert("❌ Lokasi belum diaktifkan. Aktifkan GPS Anda dan coba lagi.");
+      return;
+    }
 
-  showLoading(true);
+    if (!qrCode || qrCode !== "001-SDS Snack") {
+      alert("❌ QR Code tidak valid. Scan ulang.");
+      return;
+    }
+
+    const data = {
+      nip,
+      nama,
+      tanggal: document.getElementById("tanggal").textContent,
+      jam: document.getElementById("jam").textContent,
+      jenis: document.getElementById("jenis").textContent,
+      lokasi,
+      qrCode
+    };
+
+    showLoading(true);
 
   fetch("https://script.google.com/macros/s/AKfycbzujKGuVOiXZjb3wSwDGSrEli7q77lyxmfCGdP6JPiwTvKokE8UWIApBK-1j0kFlUSW/exec", {
     method: "POST",
