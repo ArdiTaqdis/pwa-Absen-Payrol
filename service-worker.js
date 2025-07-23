@@ -1,23 +1,15 @@
-const CACHE_NAME = 'absen-sds-v2.1'; // ✅ Ganti versi saat ada update
+const CACHE_NAME = 'absen-sds-v2.2'; // ✅ Ganti versi saat ada update
 const FILES_TO_CACHE = [
   '/',
   'index.html',
   'home.html',
   'manifest.json',
   'logo.png',
-  'form.html',
-  'rekap.html',
-  'slip.html',
-  'slip-admin.html',
   'install.html',
-  'style.css',
-  'form.js',
-  'slip.js',
-  'rekap.js',
+  'style.css', 
   'utils.js',
   'service-worker.js'
 ];
-
 
 // 📦 Install Service Worker dan simpan cache
 self.addEventListener('install', (event) => {
