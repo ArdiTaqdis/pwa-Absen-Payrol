@@ -148,6 +148,7 @@
   <div id="overlay"><div class="spinner"></div></div>
 
   <script>
+    localStorage.removeItem("qrCode"); // 🔁 Reset QR lama
     const params = new URLSearchParams(window.location.search);
     const nip = params.get("nip") || "-";
     const nama = params.get("nama") || "-";
@@ -195,7 +196,7 @@
     }
 
     ambilLokasi();
-    
+
     Html5Qrcode.getCameras().then(devices => {
       if (devices && devices.length) {
         const backCam = devices.find(d => d.label.toLowerCase().includes('back')) || devices[0];
