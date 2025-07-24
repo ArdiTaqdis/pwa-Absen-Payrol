@@ -195,33 +195,35 @@
 
       // Load riwayat
       fetch(`${url}?action=riwayatGaji&nip=${nip}`)
-        .then(res => res.json())
-        .then(data => {
-          const container = document.getElementById("riwayatGaji");
-          if (!data || data.length === 0) {
-            container.innerHTML = "📭 Belum ada riwayat gaji.";
-            return;
-          }
-          container.innerHTML = "";
-          data.forEach(item => {
-            const card = document.createElement("div");
-            card.className = "riwayat-card";
-            const badgeClass = item.status.toLowerCase().includes("belum") ? "belum" : "lunas";
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("riwayatGaji");
+    if (!data || data.length === 0) {
+      container.innerHTML = "📭 Belum ada riwayat gaji.";
+      return;
+    }
+    container.innerHTML = "";
+    
+    data.reverse().forEach(item => { // ✅ DIBALIK di sini
+      const card = document.createElement("div");
+      card.className = "riwayat-card";
+      const badgeClass = item.status.toLowerCase().includes("belum") ? "belum" : "lunas";
 
-            card.innerHTML = `
-              <div><span class="label">Periode:</span><br>${item.periode}</div>
-              <div><span class="label">Bulan:</span><br>${item.bulan}/${item.tahun}</div>
-              <div><span class="label">Jam:</span><br>${item.jam} jam</div>
-              <div><span class="label">Lembur:</span><br>${item.lembur} jam</div>
-              <div><span class="label">Pokok:</span><br>Rp ${formatRupiah(item.gajiPokok)}</div>
-              <div><span class="label">Lembur:</span><br>Rp ${formatRupiah(item.gajiLembur)}</div>
-              <div><span class="label">Total:</span><br><strong>Rp ${formatRupiah(item.subtotal)}</strong></div>
-              <div><span class="label">Status:</span><br><span class="badge ${badgeClass}">${item.status}</span></div>
-              <div><span class="label">Tanggal:</span><br>${item.timestamp}</div>
-            `;
-            container.appendChild(card);
-          });
-        })
+      card.innerHTML = `
+        <div><span class="label">Periode:</span><br>${item.periode}</div>
+        <div><span class="label">Bulan:</span><br>${item.bulan}/${item.tahun}</div>
+        <div><span class="label">Jam:</span><br>${item.jam} jam</div>
+        <div><span class="label">Lembur:</span><br>${item.lembur} jam</div>
+        <div><span class="label">Pokok:</span><br>Rp ${formatRupiah(item.gajiPokok)}</div>
+        <div><span class="label">Lembur:</span><br>Rp ${formatRupiah(item.gajiLembur)}</div>
+        <div><span class="label">Total:</span><br><strong>Rp ${formatRupiah(item.subtotal)}</strong></div>
+        <div><span class="label">Status:</span><br><span class="badge ${badgeClass}">${item.status}</span></div>
+        <div><span class="label">Tanggal:</span><br>${item.timestamp}</div>
+      `;
+      container.appendChild(card);
+    });
+  })
+
         .catch(err => {
           console.error("❌ Gagal memuat riwayat gaji:", err);
           document.getElementById("riwayatGaji").innerHTML = "⚠️ Gagal memuat data riwayat.";
