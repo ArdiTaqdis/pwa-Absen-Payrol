@@ -105,7 +105,7 @@ document.getElementById("absenForm").addEventListener("submit", function (e) {
   const jenis = document.getElementById("jenis").value;
   const lokasi = document.getElementById("lokasi").innerText;
 
-  fetch("https://script.google.com/macros/s/AKfycbzujKGuVOiXZjb3wSwDGSrEli7q77lyxmfCGdP6JPiwTvKokE8UWIApBK-1j0kFlUSW/exec", {
+  fetch("https://script.google.com/macros/s/AKfycbzVFaYQfF-L75f30jCHawoQbMWKQNocQ2Pj37cdrBRB_ydN46J7BKIzbLbL6S_HvXAp1w/exec", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
