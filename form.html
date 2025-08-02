@@ -157,7 +157,13 @@
     document.getElementById("nama").textContent = nama;
 
     const now = new Date();
-    document.getElementById("tanggal").textContent = now.toLocaleDateString("id-ID");
+    const dd = String(now.getDate()).padStart(2, '0');
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const yyyy = now.getFullYear();
+    const formatted = `${dd}/${mm}/${yyyy}`;
+
+    document.getElementById("tanggal").textContent = formatted;
+    // document.getElementById("tanggal").textContent = now.toLocaleDateString("id-ID");
     document.getElementById("jam").textContent = now.toLocaleTimeString("id-ID");
     document.getElementById("jenis").textContent = now.getHours() < 12 ? "Masuk" : "Pulang";
 
