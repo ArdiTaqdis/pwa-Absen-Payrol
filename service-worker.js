@@ -1,16 +1,16 @@
-const CACHE_NAME = "absen-sds-v2.15"; // ✅ Ganti versi saat ada update
+const CACHE_NAME = "absen-sds-v2.16"; // ✅ Ganti versi saat ada update
 const FILES_TO_CACHE = [
   "/",
   "index.html",
   "home.html",
   "kasir.html",
+  "print-rawbt-final.js",
   "print.js",
   "manifest.json",
   "logo.png",
   "install.html",
   "style.css",
   "utils.js",
-  "service-worker.js",
 ];
 
 // 📦 Install Service Worker dan simpan cache
