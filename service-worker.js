@@ -1,4 +1,4 @@
-const CACHE_NAME = "absen-sds-v2.14"; // ✅ Ganti versi saat ada update
+const CACHE_NAME = "absen-sds-v2.15"; // ✅ Ganti versi saat ada update
 const FILES_TO_CACHE = [
   "/",
   "index.html",
