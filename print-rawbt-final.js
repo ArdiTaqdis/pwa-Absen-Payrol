@@ -1,19 +1,16 @@
-// === SDS SNACK RawBT LAN (Epson TM-T82 TCP Mode) ===
 function printStrukRawBT(data) {
   try {
     const ESC = "\x1B";
     const GS = "\x1D";
     const LF = "\x0A";
 
-    // Format ESC/POS basic
     const alignLeft = (t) => ESC + "\x61\x00" + t;
     const alignCenter = (t) => ESC + "\x61\x01" + t;
     const alignRight = (t) => ESC + "\x61\x02" + t;
     const boldOn = () => ESC + "\x45\x01";
     const boldOff = () => ESC + "\x45\x00";
 
-    let text = "";
-    text += ESC + "@"; // Initialize printer
+    let text = ESC + "@"; // init printer
     text += alignCenter(boldOn() + "SDS SNACK\n" + boldOff());
     text += alignCenter("Menerima Pesanan Snack Box,\n");
     text += alignCenter("Aneka Kue dan Roti\n");
@@ -21,7 +18,7 @@ function printStrukRawBT(data) {
     text += alignCenter("Jln Raya Dieng Km 17 Kejajar Wonosobo 56354\n");
     text += alignCenter("Tlp/WA: 0823-2806-6205\n");
     text += alignCenter("--------------------------------\n");
-    text += alignLeft("Tanggal: " + data.tanggal + "\n");
+    text += alignLeft("Tanggal : " + data.tanggal + "\n");
     text += alignCenter("--------------------------------\n");
 
     data.items.forEach((item) => {
@@ -40,17 +37,17 @@ function printStrukRawBT(data) {
     text += alignCenter("--------------------------------\n");
     text += alignCenter("Terima Kasih 🙏\n");
     text += alignCenter("Selamat Menikmati!\n");
-    text += LF.repeat(3);
-    text += GS + "V" + "\x00"; // Cut paper
+    text += LF.repeat(4);
+    text += GS + "V" + "\x00"; // cut
 
-    // Konversi ke base64 untuk dikirim ke RawBT LAN
-    const b64 = btoa(unescape(encodeURIComponent(text)));
+    // 🟣 Kirim ESC/POS ke RawBT (Intent Android)
+    const intentURL =
+      "intent:" +
+      encodeURIComponent(text) +
+      "#Intent;scheme=rawbtprint;package=ru.a402d.rawbtprinter;end";
 
-    // URL RawBT LAN printer
-    const url = `rawbt://print?data=${b64}`;
-
-    window.location.href = url;
+    window.location.href = intentURL;
   } catch (e) {
-    alert("❌ Gagal mencetak via RawBT LAN: " + e.message);
+    alert("❌ Gagal cetak RawBT: " + e.message);
   }
 }
