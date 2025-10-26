@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SDS SNACK - Kasir Penjualan</title>
+    <script src="print-rawbt.js" defer></script>
 
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#8067eb" />
@@ -287,24 +288,17 @@
         }
 
         const data = {
-          printerIP,
           items,
           total,
           tanggal: new Date().toLocaleString("id-ID"),
         };
 
-        document.getElementById("status").textContent =
-          "🖨 Mengirim ke printer...";
-        if (typeof printStrukEpson === "function") {
-          printStrukEpson(data);
+        // ✅ Kirim ke RawBT (Android)
+        if (typeof printStrukRawBT === "function") {
+          printStrukRawBT(data);
         } else {
           window.print();
         }
-
-        setTimeout(() => {
-          document.getElementById("status").textContent =
-            "✅ Struk berhasil dicetak!";
-        }, 2000);
       }
     </script>
   </body>
