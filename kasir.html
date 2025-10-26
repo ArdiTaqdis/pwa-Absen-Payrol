@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SDS SNACK - Kasir Penjualan</title>
+
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#8067eb" />
+    <script
+      src="https://epson.github.io/epos-print-sdk/epos-print.js"
+      async
+      defer
+    ></script>
+    <script src="print.js" defer></script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("service-worker.js");
+      }
+    </script>
+
+    <style>
+      :root {
+        --ungu: #8067eb;
+        --ungu-muda: #cac1ff;
+        --ungu-gelap: #6f56d9;
+        --putih: #ffffff;
+        --bg: #f9f8ff;
+      }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: var(--bg);
+        margin: 0;
+        padding: 20px;
+        color: #333;
+      }
+
+      h2 {
+        text-align: center;
+        color: var(--ungu);
+        margin-bottom: 0;
+      }
+
+      small {
+        color: #777;
+      }
+
+      .kasir-box {
+        max-width: 480px;
+        margin: 20px auto;
+        background: var(--putih);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      label {
+        font-weight: 600;
+        color: var(--ungu-gelap);
+      }
+
+      input {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0 12px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+        outline: none;
+      }
+
+      input:focus {
+        border-color: var(--ungu);
+        box-shadow: 0 0 4px rgba(128, 103, 235, 0.4);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        font-size: 0.9rem;
+      }
+
+      th,
+      td {
+        border: 1px solid #e4dfff;
+        padding: 8px;
+        text-align: center;
+      }
+
+      th {
+        background: var(--ungu);
+        color: white;
+      }
+
+      button {
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.2s;
+      }
+
+      .add-btn {
+        background: #6ed37f;
+        color: white;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .add-btn:hover {
+        background: #53b86a;
+      }
+
+      .print-btn {
+        background: var(--ungu);
+        color: white;
+        width: 100%;
+        margin-top: 20px;
+      }
+
+      .print-btn:hover {
+        background: var(--ungu-gelap);
+      }
+
+      .hapus-btn {
+        background: #f87171;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 4px 8px;
+        cursor: pointer;
+      }
+
+      .hapus-btn:hover {
+        background: #dc2626;
+      }
+
+      .status {
+        margin-top: 10px;
+        text-align: center;
+        font-size: 0.9em;
+        color: #555;
+      }
+
+      #configBox {
+        margin-top: 15px;
+        text-align: center;
+      }
+
+      #configBox small {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+      }
+
+      footer {
+        text-align: center;
+        font-size: 0.8rem;
+        color: #888;
+        margin-top: 20px;
+      }
+
+      .back-btn {
+        margin-top: 20px;
+        text-align: center;
+        display: block;
+        color: var(--ungu);
+        font-weight: bold;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>💜 SDS SNACK<br /><small>Kasir Penjualan Toko Kue & Roti</small></h2>
+
+    <div class="kasir-box">
+      <label>Nama Item</label>
+      <input type="text" id="itemName" placeholder="Contoh: Roti Coklat" />
+      <label>Harga (Rp)</label>
+      <input type="number" id="itemPrice" placeholder="5000" />
+      <label>Qty</label>
+      <input type="number" id="itemQty" placeholder="1" />
+
+      <button class="add-btn" onclick="tambahItem()">+ Tambah Item</button>
+
+      <table id="itemTable">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Harga</th>
+            <th>Qty</th>
+            <th>Jumlah</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <h3>Total: Rp <span id="totalBayar">0</span></h3>
+
+      <div id="configBox">
+        <small>Printer IP: <span id="ipLabel">-</span></small>
+        <button onclick="aturPrinter()">⚙️ Atur Printer</button>
+      </div>
+
+      <button class="print-btn" onclick="printStruk()">🖨 Cetak Struk</button>
+      <div id="status" class="status"></div>
+
+      <a href="home.html" class="back-btn">⬅️ Kembali ke Home</a>
+    </div>
+
+    <footer>© 2025 SDS Snack | Sistem Kasir PWA</footer>
+
+    <script>
+      let items = [];
+      let total = 0;
+      let printerIP = localStorage.getItem("printerIP") || "-";
+
+      document.getElementById("ipLabel").textContent = printerIP;
+
+      function tambahItem() {
+        const nama = document.getElementById("itemName").value.trim();
+        const harga = parseInt(document.getElementById("itemPrice").value);
+        const qty = parseInt(document.getElementById("itemQty").value);
+
+        if (!nama || !harga || !qty || harga <= 0 || qty <= 0) {
+          alert("⚠️ Lengkapi data item dengan benar!");
+          return;
+        }
+
+        const jumlah = harga * qty;
+        items.push({ nama, harga, qty, jumlah });
+        updateTabel();
+        resetInput();
+      }
+
+      function hapusItem(index) {
+        items.splice(index, 1);
+        updateTabel();
+      }
+
+      function updateTabel() {
+        const tbody = document.querySelector("#itemTable tbody");
+        tbody.innerHTML = "";
+        total = 0;
+
+        items.forEach((item, i) => {
+          total += item.jumlah;
+          tbody.innerHTML += `
+            <tr>
+              <td>${item.nama}</td>
+              <td>${item.harga.toLocaleString()}</td>
+              <td>${item.qty}</td>
+              <td>${item.jumlah.toLocaleString()}</td>
+              <td><button class="hapus-btn" onclick="hapusItem(${i})">Hapus</button></td>
+            </tr>
+          `;
+        });
+
+        document.getElementById("totalBayar").textContent =
+          total.toLocaleString();
+      }
+
+      function resetInput() {
+        document.getElementById("itemName").value = "";
+        document.getElementById("itemPrice").value = "";
+        document.getElementById("itemQty").value = 1;
+      }
+
+      function aturPrinter() {
+        const ip = prompt("Masukkan IP Printer Epson:", printerIP);
+        if (ip) {
+          printerIP = ip;
+          localStorage.setItem("printerIP", ip);
+          document.getElementById("ipLabel").textContent = ip;
+        }
+      }
+
+      function printStruk() {
+        if (items.length === 0) {
+          alert("Belum ada item di daftar!");
+          return;
+        }
+
+        const data = {
+          printerIP,
+          items,
+          total,
+          tanggal: new Date().toLocaleString("id-ID"),
+        };
+
+        document.getElementById("status").textContent =
+          "🖨 Mengirim ke printer...";
+        if (typeof printStrukEpson === "function") {
+          printStrukEpson(data);
+        } else {
+          window.print();
+        }
+
+        setTimeout(() => {
+          document.getElementById("status").textContent =
+            "✅ Struk berhasil dicetak!";
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
