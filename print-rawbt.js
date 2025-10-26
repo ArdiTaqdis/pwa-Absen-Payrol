@@ -1,74 +1,59 @@
-/* =========================================================
-   print-rawbt.js — SDS SNACK 💜
-   Versi khusus printer ESC/POS via RawBT (Android)
-   ========================================================= */
+// === SDS SNACK PRINT MODULE ===
+// Versi Profesional - Cetak Langsung ke RawBT (Epson TM-T82)
 
-function printStrukRawBT(data) {
+// Fungsi posisi teks
+function alignLeft(text) {
+  return "\x1B\x61\x00" + text; // ESC a 0 (left)
+}
+function alignCenter(text) {
+  return "\x1B\x61\x01" + text; // ESC a 1 (center)
+}
+function alignRight(text) {
+  return "\x1B\x61\x02" + text; // ESC a 2 (right)
+}
+function line() {
+  return "------------------------------------------\n";
+}
+
+async function printStrukRawBT(data) {
   try {
-    if (!data || !data.items || data.items.length === 0) {
-      alert("⚠️ Tidak ada item untuk dicetak!");
-      return;
-    }
+    const { printerIP, items, total, tanggal } = data;
 
-    // 💜 Header
-    let struk = "";
-    struk += center("💜 SDS SNACK 💜") + "\n";
-    struk += center("Toko Kue & Roti") + "\n";
-    struk += center("Banyuwangi - 2025") + "\n";
-    struk += "========================================\n";
-    struk += alignLeft(`Tanggal: ${data.tanggal}`) + "\n";
-    struk += "----------------------------------------\n";
+    let text = "";
 
-    // 🧁 Daftar Item
-    data.items.forEach((i) => {
-      const nama = i.nama.length > 24 ? i.nama.slice(0, 24) : i.nama;
-      struk += `${nama}\n`;
-      struk += `${padRight(
-        i.qty + "x" + i.harga.toLocaleString(),
-        20
-      )}Rp${padLeft(i.jumlah.toLocaleString(), 10)}\n`;
+    // === HEADER TOKO ===
+    text += alignCenter("SDS SNACK\n");
+    text += alignCenter("Menerima Pesanan Snack Box,\n");
+    text += alignCenter("Aneka Kue dan Roti\n");
+    text += alignCenter("Jln Raya Dieng Km 17 Kejajar\n");
+    text += alignCenter("Wonosobo 56354\n");
+    text += alignCenter("Telp/WA: 082328066205\n");
+    text += line();
+    text += alignLeft(`Tanggal : ${tanggal}\n`);
+    text += line();
+
+    // === ISI ITEM ===
+    items.forEach((item) => {
+      text += `${item.nama}\n${
+        item.qty
+      } x ${item.harga.toLocaleString()} = ${item.jumlah.toLocaleString()}\n`;
     });
 
-    struk += "----------------------------------------\n";
-    struk +=
-      padRight("TOTAL", 20) +
-      "Rp" +
-      padLeft(data.total.toLocaleString(), 10) +
-      "\n";
-    struk += "========================================\n";
-    struk += center("Terima kasih 💜") + "\n";
-    struk += center("Fresh Everyday!") + "\n";
-    struk += center("~ SDS Snack ~") + "\n\n\n\n";
+    text += line();
+    text += alignRight(`TOTAL: Rp ${total.toLocaleString()}\n`);
+    text += line();
 
-    // 🚀 Kirim ke RawBT (Android intent)
-    const rawbtURL = "rawbt:print?text=" + encodeURIComponent(struk);
-    window.location.href = rawbtURL;
+    // === FOOTER ===
+    text += alignCenter("Terima Kasih\n");
+    text += alignCenter("Selamat Menikmati\n");
+    text += alignCenter("Follow IG: @sdssnack.official\n\n\n\n");
 
-    // ✅ Update status (kalau ada elemen #status di halaman)
-    const status = document.getElementById("status");
-    if (status) status.textContent = "🖨 Mengirim ke aplikasi RawBT...";
+    // === KIRIM KE RAWBT ===
+    const printUrl = `intent:rawbtprint#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodeURIComponent(
+      text
+    )};end`;
+    window.location.href = printUrl;
   } catch (err) {
-    console.error(err);
     alert("❌ Gagal mencetak via RawBT: " + err.message);
-    window.print(); // fallback
   }
-}
-
-/* =========================================================
-   UTILITAS FORMAT STRUK
-   ========================================================= */
-function padLeft(str, width) {
-  str = str.toString();
-  return str.length >= width ? str : " ".repeat(width - str.length) + str;
-}
-
-function padRight(str, width) {
-  str = str.toString();
-  return str.length >= width ? str : str + " ".repeat(width - str.length);
-}
-
-function center(str) {
-  const width = 40;
-  const left = Math.floor((width - str.length) / 2);
-  return " ".repeat(left) + str;
 }
