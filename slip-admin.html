@@ -1,415 +1,523 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="theme-color" content="#8067eb">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Slip Gaji - Tim SDS Snack</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      padding: 1rem;
-      background: #f4f6f8;
-      margin: 0;
-    }
-    h1 {
-      text-align: center;
-      color: #4a148c;
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-    }
-    .filter {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      justify-content: center;
-      margin-bottom: 1rem;
-    }
-    .filter label {
-      font-size: 0.9rem;
-    }
-    select, button {
-      padding: 0.5rem;
-      font-size: 1rem;
-      border-radius: 5px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      font-size: 0.9rem;
-      overflow-x: auto;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.6rem;
-      text-align: center;
-    }
-    th {
-      background-color: #6a1b9a;
-      color: white;
-    }
-    .modal {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-    .modal.show {
-      display: flex;
-    }
-    .modal-content {
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
-      width: 95%;
-      max-width: 480px;
-      box-sizing: border-box;
-      overflow-y: auto;
-      max-height: 90vh;
-    }
-    .modal-content table {
-      width: 100%;
-      font-size: 0.85rem;
-    }
-    .modal-content button {
-      margin-top: 0.5rem;
-      margin-right: 0.5rem;
-      padding: 0.5rem 1rem;
-    }
-
-    @media (max-width: 480px) {
-      th, td {
-        padding: 0.4rem;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#8067eb" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Slip Gaji - Tim SDS Snack</title>
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        padding: 1rem;
+        background: #f4f6f8;
+        margin: 0;
+      }
+      h1 {
+        text-align: center;
+        color: #4a148c;
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+      }
+      .filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+        margin-bottom: 1rem;
+      }
+      .filter label {
+        font-size: 0.9rem;
+      }
+      select,
+      button {
+        padding: 0.5rem;
+        font-size: 1rem;
+        border-radius: 5px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        font-size: 0.9rem;
+        overflow-x: auto;
+      }
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 0.6rem;
+        text-align: center;
+      }
+      th {
+        background-color: #6a1b9a;
+        color: white;
+      }
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+      .modal.show {
+        display: flex;
       }
       .modal-content {
-        padding: 1rem 0.8rem;
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        width: 95%;
+        max-width: 480px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        max-height: 90vh;
       }
-    }
-  </style>
-</head>
-<body>
+      .modal-content table {
+        width: 100%;
+        font-size: 0.85rem;
+      }
+      .modal-content button {
+        margin-top: 0.5rem;
+        margin-right: 0.5rem;
+        padding: 0.5rem 1rem;
+      }
 
-  <h1>Rekap Gaji Tim SDS Snack</h1>
+      @media (max-width: 480px) {
+        th,
+        td {
+          padding: 0.4rem;
+        }
+        .modal-content {
+          padding: 1rem 0.8rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Rekap Gaji Tim SDS Snack</h1>
 
-  <div class="filter">
-    <label>Bulan:</label>
-    <select id="bulanSelect"></select>
+    <div class="filter">
+      <label>Bulan:</label>
+      <select id="bulanSelect"></select>
 
-    <label>Tahun:</label>
-    <select id="tahunSelect"></select>
+      <label>Tahun:</label>
+      <select id="tahunSelect"></select>
 
-    <!-- <label>NIP:</label>
+      <!-- <label>NIP:</label>
     <select id="nipSelect"></select> -->
 
-    <label>Periode:</label>
-    <select id="periodeSelect">
-      <option value="1">1–15</option>
-      <option value="2">16–31</option>
-    </select>
-
-    <button onclick="loadRekap()">🔍 Tampilkan</button>
-  </div>
-
-  <div style="overflow-x: auto;">
-    <table>
-      <thead>
-        <tr>
-          <th>NIP</th>
-          <th>Nama</th>
-          <th>Gaji Pokok</th>
-          <th>Lembur</th>
-          <th>Subtotal</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="rekapBody"></tbody>
-      <tfoot>
-        <tr>
-          <td colspan="4" style="text-align:right"><strong>Total Gaji:</strong></td>
-          <td colspan="2" id="totalSemuaGaji" style="color:green; font-weight:bold;"></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
-
-  <!-- Modal -->
-  <div class="modal" id="slipModal">
-    <div class="modal-content">
-      <h2 style="text-align:center; color:#6a1b9a;">Slip Gaji</h2>
-      <p><strong>Nama:</strong> <span id="slipNama"></span></p>
-      <p><strong>NIP:</strong> <span id="slipNIP"></span></p>
-      <p><strong>Periode:</strong> <span id="slipPeriode"></span></p>
-
-      <table>
-        <thead>
-          <tr><th>Komponen</th><th>Jam</th><th>Tarif</th><th>Total</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Jam Kerja</td>
-            <td id="slipJamKerja"></td>
-            <td id="slipTarifKerja"></td>
-            <td id="slipGajiPokok"></td>
-          </tr>
-          <tr>
-            <td>Jam Lembur</td>
-            <td id="slipJamLembur"></td>
-            <td id="slipTarifLembur"></td>
-            <td id="slipGajiLembur"></td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr><td colspan="3"><strong>Total</strong></td><td id="slipTotalGaji"></td></tr>
-        </tfoot>
-      </table>
-
-      <label>Status Pembayaran:</label>
-      <select id="statusPembayaran">
-        <option value="Belum Dibayarkan">Belum Dibayarkan</option>
-        <option value="Sudah Dibayarkan">Sudah Dibayarkan</option>
+      <label>Periode:</label>
+      <select id="periodeSelect">
+        <option value="1">1–15</option>
+        <option value="2">16–31</option>
       </select>
 
+      <button onclick="loadRekap()">🔍 Tampilkan</button>
+    </div>
 
-      <p style="font-size:0.85rem; font-style:italic;">Slip ini dibuat otomatis oleh sistem SDS Snack.</p>
+    <div style="overflow-x: auto">
+      <table>
+        <thead>
+          <tr>
+            <th>NIP</th>
+            <th>Nama</th>
+            <th>Gaji Pokok</th>
+            <th>Lembur</th>
+            <th>Subtotal</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="rekapBody"></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4" style="text-align: right">
+              <strong>Total Gaji:</strong>
+            </td>
+            <td
+              colspan="2"
+              id="totalSemuaGaji"
+              style="color: green; font-weight: bold"
+            ></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
 
-      <div style="text-align:center; margin-top:1rem;">
-        <button onclick="simpanStatus()">💾 Simpan Status</button>
-        <button onclick="tutupSlip()">Tutup</button>
-        <button onclick="cetakSlip()">🖨 Cetak</button>
-        <button onclick="kirimWA()">📤 Kirim WA</button>
+    <!-- Modal -->
+    <div class="modal" id="slipModal">
+      <div class="modal-content">
+        <h2 style="text-align: center; color: #6a1b9a">Slip Gaji</h2>
+        <p><strong>Nama:</strong> <span id="slipNama"></span></p>
+        <p><strong>NIP:</strong> <span id="slipNIP"></span></p>
+        <p><strong>Periode:</strong> <span id="slipPeriode"></span></p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Komponen</th>
+              <th>Jam</th>
+              <th>Tarif</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Jam Kerja</td>
+              <td id="slipJamKerja"></td>
+              <td id="slipTarifKerja"></td>
+              <td id="slipGajiPokok"></td>
+            </tr>
+            <tr>
+              <td>Jam Lembur</td>
+              <td id="slipJamLembur"></td>
+              <td id="slipTarifLembur"></td>
+              <td id="slipGajiLembur"></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"><strong>Total</strong></td>
+              <td id="slipTotalGaji"></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <label>Status Pembayaran:</label>
+        <select id="statusPembayaran">
+          <option value="Belum Dibayarkan">Belum Dibayarkan</option>
+          <option value="Sudah Dibayarkan">Sudah Dibayarkan</option>
+        </select>
+
+        <p style="font-size: 0.85rem; font-style: italic">
+          Slip ini dibuat otomatis oleh sistem SDS Snack.
+        </p>
+
+        <div style="text-align: center; margin-top: 1rem">
+          <button onclick="simpanStatus()">💾 Simpan Status</button>
+          <button onclick="tutupSlip()">Tutup</button>
+          <button onclick="cetakSlip()">🖨 Cetak</button>
+          <button onclick="kirimWA()">📤 Kirim WA</button>
+        </div>
       </div>
     </div>
-  </div>
 
-      <div id="toast" style="
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #4caf50;
-      color: white;
-      padding: 12px 20px;
-      border-radius: 6px;
-      display: none;
-      font-weight: bold;
-      z-index: 99999;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    ">Status berhasil disimpan.</div>
+    <div
+      id="toast"
+      style="
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #4caf50;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 6px;
+        display: none;
+        font-weight: bold;
+        z-index: 99999;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      "
+    >
+      Status berhasil disimpan.
+    </div>
 
+    <script>
+      let currentNoWa = "";
+      const baseUrl =
+        "https://script.google.com/macros/s/AKfycbzJ40reGT8CK-FtfCJLEkEP1bHM4bMrk4CuVqFFshPLN-9sqMGNgyRZ5qfhjDrgZxsw/exec";
 
-  <script>
-    let currentNoWa = "";
-    const baseUrl = "https://script.google.com/macros/s/AKfycbzJ40reGT8CK-FtfCJLEkEP1bHM4bMrk4CuVqFFshPLN-9sqMGNgyRZ5qfhjDrgZxsw/exec";
+      async function loadRekap() {
+        const periode = document.getElementById("periodeSelect").value;
+        const bulan = document.getElementById("bulanSelect").value;
+        const tahun = document.getElementById("tahunSelect").value;
+        const res = await fetch(`${baseUrl}?action=allNIP`);
+        const data = await res.json();
+        const tbody = document.getElementById("rekapBody");
+        let total = 0;
 
+        tbody.innerHTML = "";
 
-    async function loadRekap() {
-      const periode = document.getElementById("periodeSelect").value;
-      const bulan = document.getElementById("bulanSelect").value;
-      const tahun = document.getElementById("tahunSelect").value;
-      const res = await fetch(`${baseUrl}?action=allNIP`);
-      const data = await res.json();
-      const tbody = document.getElementById("rekapBody");
-      let total = 0;
+        for (let item of data) {
+          const gajiRes = await fetch(
+            `${baseUrl}?action=gaji&nip=${item.nip}&bulan=${bulan}&tahun=${tahun}`
+          );
+          const gaji = await gajiRes.json();
+          const p = periode === "1" ? gaji.periode1 : gaji.periode2;
 
-      tbody.innerHTML = "";
-
-      for (let item of data) {
-        const gajiRes = await fetch(`${baseUrl}?action=gaji&nip=${item.nip}&bulan=${bulan}&tahun=${tahun}`);
-        const gaji = await gajiRes.json();
-        const p = periode === "1" ? gaji.periode1 : gaji.periode2;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
           <td>${item.nip}</td>
           <td>${item.nama}</td>
           <td>${formatRupiah(p.gajiPokok)}</td>
           <td>${formatRupiah(p.gajiLembur)}</td>
           <td>${formatRupiah(p.subtotal)}</td>
-          <td><button onclick="tampilkanSlip('${item.nip}', '${item.nama}')">Lihat Slip</button></td>
+          <td><button onclick="tampilkanSlip('${item.nip}', '${
+            item.nama
+          }')">Lihat Slip</button></td>
         `;
-        tbody.appendChild(tr);
-        total += p.subtotal;
+          tbody.appendChild(tr);
+          total += p.subtotal;
+        }
+
+        document.getElementById("totalSemuaGaji").textContent =
+          formatRupiah(total);
       }
 
-      document.getElementById("totalSemuaGaji").textContent = formatRupiah(total);
-    }
+      async function tampilkanSlip(nip, nama) {
+        const periode = document.getElementById("periodeSelect").value;
+        const bulan = document.getElementById("bulanSelect").value;
+        const tahun = document.getElementById("tahunSelect").value;
 
-    async function tampilkanSlip(nip, nama) {
-      const periode = document.getElementById("periodeSelect").value;
-      const bulan = document.getElementById("bulanSelect").value;
-      const tahun = document.getElementById("tahunSelect").value;
+        const res = await fetch(
+          `${baseUrl}?action=gaji&nip=${nip}&bulan=${bulan}&tahun=${tahun}`
+        );
+        const data = await res.json();
+        const p = periode === "1" ? data.periode1 : data.periode2;
 
-      const res = await fetch(`${baseUrl}?action=gaji&nip=${nip}&bulan=${bulan}&tahun=${tahun}`);
-      const data = await res.json();
-      const p = periode === "1" ? data.periode1 : data.periode2;
+        document.getElementById("slipNama").textContent = nama;
+        document.getElementById("slipNIP").textContent = nip;
+        document.getElementById("slipPeriode").textContent = `${
+          p.tanggal
+        } ${getNamaBulan(bulan)} ${tahun}`;
+        document.getElementById("slipJamKerja").textContent = p.jamNormal;
+        document.getElementById("slipTarifKerja").textContent = formatRupiah(
+          data.tarifNormal || 0
+        );
+        document.getElementById("slipGajiPokok").textContent = formatRupiah(
+          p.gajiPokok
+        );
+        document.getElementById("slipJamLembur").textContent = p.lembur;
+        document.getElementById("slipTarifLembur").textContent = formatRupiah(
+          data.tarifLembur || 0
+        );
+        document.getElementById("slipGajiLembur").textContent = formatRupiah(
+          p.gajiLembur
+        );
+        document.getElementById("slipTotalGaji").textContent = formatRupiah(
+          p.subtotal
+        );
 
-      document.getElementById("slipNama").textContent = nama;
-      document.getElementById("slipNIP").textContent = nip;
-      document.getElementById("slipPeriode").textContent = `${p.tanggal} ${getNamaBulan(bulan)} ${tahun}`;
-      document.getElementById("slipJamKerja").textContent = p.jamNormal;
-      document.getElementById("slipTarifKerja").textContent = formatRupiah(data.tarifNormal || 0);
-      document.getElementById("slipGajiPokok").textContent = formatRupiah(p.gajiPokok);
-      document.getElementById("slipJamLembur").textContent = p.lembur;
-      document.getElementById("slipTarifLembur").textContent = formatRupiah(data.tarifLembur || 0);
-      document.getElementById("slipGajiLembur").textContent = formatRupiah(p.gajiLembur);
-      document.getElementById("slipTotalGaji").textContent = formatRupiah(p.subtotal);
+        currentNoWa = data.noWa || "";
+        document.getElementById("slipModal").classList.add("show");
 
-      currentNoWa = data.noWa || "";
-      document.getElementById("slipModal").classList.add("show");
+        // Ambil status pembayaran dari sheet RekapGaji
+        const statusRes = await fetch(
+          `${baseUrl}?action=getStatusGaji&nip=${nip}&periode=${periode}&bulan=${bulan}&tahun=${tahun}`
+        );
+        const statusData = await statusRes.json();
+        const status = statusData.status || "Belum Dibayarkan";
 
-      // Ambil status pembayaran dari sheet RekapGaji
-      const statusRes = await fetch(`${baseUrl}?action=getStatusGaji&nip=${nip}&periode=${periode}&bulan=${bulan}&tahun=${tahun}`);
-      const statusData = await statusRes.json();
-      const status = statusData.status || "Belum Dibayarkan";
+        const statusSelect = document.getElementById("statusPembayaran");
+        statusSelect.value =
+          status === "Sudah Dibayarkan"
+            ? "Sudah Dibayarkan"
+            : "Belum Dibayarkan";
 
-      const statusSelect = document.getElementById("statusPembayaran");
-       statusSelect.value = status === "Sudah Dibayarkan" ? "Sudah Dibayarkan" : "Belum Dibayarkan";
-
-      // Jika sudah dibayarkan, disable dropdown dan tombol simpan
-      const simpanBtn = document.querySelector("button[onclick='simpanStatus()']");
-      if (status === "Sudah Dibayarkan") {
-        statusSelect.disabled = true;
-        simpanBtn.disabled = true;
-        simpanBtn.style.opacity = 0.6;
-      } else {
-        statusSelect.disabled = false;
-        simpanBtn.disabled = false;
-        simpanBtn.style.opacity = 1;
+        // Jika sudah dibayarkan, disable dropdown dan tombol simpan
+        const simpanBtn = document.querySelector(
+          "button[onclick='simpanStatus()']"
+        );
+        if (status === "Sudah Dibayarkan") {
+          statusSelect.disabled = true;
+          simpanBtn.disabled = true;
+          simpanBtn.style.opacity = 0.6;
+        } else {
+          statusSelect.disabled = false;
+          simpanBtn.disabled = false;
+          simpanBtn.style.opacity = 1;
+        }
       }
 
-    }
-
-    function tutupSlip() {
-      document.getElementById("slipModal").classList.remove("show");
-    }
-
-    function cetakSlip() {
-      window.print();
-    }
-
-    function kirimWA() {
-      const nama = document.getElementById("slipNama").textContent;
-      const nip = document.getElementById("slipNIP").textContent;
-      const periode = document.getElementById("slipPeriode").textContent;
-      const total = document.getElementById("slipTotalGaji").textContent;
-      const status = document.getElementById("statusPembayaran").value;
-
-      if (!currentNoWa) return alert("Nomor WhatsApp tidak ditemukan.");
-      const pesan = `Slip Gaji SDS Snack\nNama: ${nama}\nNIP: ${nip}\nPeriode: ${periode}\nTotal Gaji: ${total}\nStatus: ${status}`;
-      window.open(`https://wa.me/${currentNoWa}?text=${encodeURIComponent(pesan)}`, "_blank");
-    }
-
-    function getNamaBulan(bulan) {
-      const namaBulan = ["Januari","Februari","Maret","April","Mei","Juni","Juli",
-                         "Agustus","September","Oktober","November","Desember"];
-      return namaBulan[bulan - 1] || "";
-    }
-
-    function showToast(message, color = "#4caf50") {
-      const toast = document.getElementById("toast");
-      toast.textContent = message;
-      toast.style.background = color;
-      toast.style.display = "block";
-      setTimeout(() => {
-        toast.style.display = "none";
-      }, 3000);
-    }
-
-
-   async function simpanStatus() {
-  const status = document.getElementById("statusPembayaran").value;
-
-  if (status === "Belum Dibayarkan") {
-    alert("❌ Status masih 'Belum Dibayarkan'.\nSilakan ubah ke 'Sudah Dibayarkan' sebelum menyimpan.");
-    return; // Hentikan proses simpan
-  }
-
-  const data = new URLSearchParams();
-  data.append("action", "simpanStatusGaji");
-  data.append("nip", document.getElementById("slipNIP").textContent);
-  data.append("nama", document.getElementById("slipNama").textContent);
-  data.append("periode", document.getElementById("slipPeriode").textContent.split(" ")[0]);
-  data.append("bulan", document.getElementById("bulanSelect").value);
-  data.append("tahun", document.getElementById("tahunSelect").value);
-  data.append("jamKerja", document.getElementById("slipJamKerja").textContent);
-  data.append("lembur", document.getElementById("slipJamLembur").textContent);
-  data.append("gajiPokok", getAngka(document.getElementById("slipGajiPokok").textContent));
-  data.append("gajiLembur", getAngka(document.getElementById("slipGajiLembur").textContent));
-  data.append("subtotal", getAngka(document.getElementById("slipTotalGaji").textContent));
-  data.append("status", status);
-
-  try {
-    const res = await fetch(baseUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: data
-    });
-
-    let result = {};
-    try {
-      result = await res.json();
-    } catch (jsonErr) {
-      console.warn("⚠️ Tidak bisa parse JSON (CORS?):", jsonErr.message);
-      showToast("⚠️ Mungkin berhasil, tapi gagal membaca balasan server (CORS).", "#ff9800");
-      tutupSlip();
-      return;
-    }
-
-    if (result.status === "success") {
-      showToast("✅ Status berhasil disimpan.");
-    } else {
-      showToast("❌ Gagal menyimpan status: " + result.message, "#f44336");
-    }
-
-  } catch (err) {
-    console.error("❌ Error:", err.message);
-    if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
-      showToast("⚠️ Mungkin berhasil, tapi gagal membaca balasan server (CORS).", "#ff9800");
-    } else {
-      showToast("❌ Gagal koneksi: " + err.message, "#f44336");
-    }
-  } finally {
-    tutupSlip();
-  }
-}
-
-
-
-  function getAngka(rupiah) {
-  const clean = rupiah
-    .replace(/[Rp\s]/g, '')     // hapus Rp dan spasi
-    .replace(/\./g, '')         // hapus titik ribuan
-    .replace(',', '.');         // ubah koma jadi titik
-  return Math.round(parseFloat(clean)) || 0;
-}
-
-
-
-    function formatRupiah(value) {
-      return new Intl.NumberFormat("id-ID", { style: 'currency', currency: 'IDR' }).format(value);
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      
-      const tahunSelect = document.getElementById("tahunSelect");
-      const bulanSelect = document.getElementById("bulanSelect");
-      const now = new Date();
-      const tahunIni = now.getFullYear();
-      for (let i = tahunIni - 1; i <= tahunIni + 1; i++) {
-        tahunSelect.innerHTML += `<option value="${i}" ${i === tahunIni ? 'selected' : ''}>${i}</option>`;
+      function tutupSlip() {
+        document.getElementById("slipModal").classList.remove("show");
       }
-      for (let i = 1; i <= 12; i++) {
-        bulanSelect.innerHTML += `<option value="${i}" ${i === (now.getMonth()+1) ? 'selected' : ''}>${i}</option>`;
+
+      function cetakSlip() {
+        window.print();
       }
-    });
-  </script>
-</body>
+
+      function kirimWA() {
+        const nama = document.getElementById("slipNama").textContent;
+        const nip = document.getElementById("slipNIP").textContent;
+        const periode = document.getElementById("slipPeriode").textContent;
+        const total = document.getElementById("slipTotalGaji").textContent;
+        const status = document.getElementById("statusPembayaran").value;
+
+        if (!currentNoWa) return alert("Nomor WhatsApp tidak ditemukan.");
+        const pesan = `Slip Gaji SDS Snack\nNama: ${nama}\nNIP: ${nip}\nPeriode: ${periode}\nTotal Gaji: ${total}\nStatus: ${status}`;
+        window.open(
+          `https://wa.me/${currentNoWa}?text=${encodeURIComponent(pesan)}`,
+          "_blank"
+        );
+      }
+
+      function getNamaBulan(bulan) {
+        const namaBulan = [
+          "Januari",
+          "Februari",
+          "Maret",
+          "April",
+          "Mei",
+          "Juni",
+          "Juli",
+          "Agustus",
+          "September",
+          "Oktober",
+          "November",
+          "Desember",
+        ];
+        return namaBulan[bulan - 1] || "";
+      }
+
+      function showToast(message, color = "#4caf50") {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.style.background = color;
+        toast.style.display = "block";
+        setTimeout(() => {
+          toast.style.display = "none";
+        }, 3000);
+      }
+
+      async function simpanStatus() {
+        const status = document.getElementById("statusPembayaran").value;
+
+        if (status === "Belum Dibayarkan") {
+          alert(
+            "❌ Status masih 'Belum Dibayarkan'.\nSilakan ubah ke 'Sudah Dibayarkan' sebelum menyimpan."
+          );
+          return; // Hentikan proses simpan
+        }
+
+        const data = new URLSearchParams();
+        data.append("action", "simpanStatusGaji");
+        data.append("nip", document.getElementById("slipNIP").textContent);
+        data.append("nama", document.getElementById("slipNama").textContent);
+        data.append(
+          "periode",
+          document.getElementById("slipPeriode").textContent.split(" ")[0]
+        );
+        data.append("bulan", document.getElementById("bulanSelect").value);
+        data.append("tahun", document.getElementById("tahunSelect").value);
+        data.append(
+          "jamKerja",
+          document.getElementById("slipJamKerja").textContent
+        );
+        data.append(
+          "lembur",
+          document.getElementById("slipJamLembur").textContent
+        );
+        data.append(
+          "gajiPokok",
+          getAngka(document.getElementById("slipGajiPokok").textContent)
+        );
+        data.append(
+          "gajiLembur",
+          getAngka(document.getElementById("slipGajiLembur").textContent)
+        );
+        data.append(
+          "subtotal",
+          getAngka(document.getElementById("slipTotalGaji").textContent)
+        );
+        data.append("status", status);
+
+        try {
+          const res = await fetch(baseUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: data,
+          });
+
+          let result = {};
+          try {
+            result = await res.json();
+          } catch (jsonErr) {
+            console.warn("⚠️ Tidak bisa parse JSON (CORS?):", jsonErr.message);
+            showToast(
+              "⚠️ Mungkin berhasil, tapi gagal membaca balasan server (CORS).",
+              "#ff9800"
+            );
+            tutupSlip();
+            return;
+          }
+
+          if (result.status === "success") {
+            showToast("✅ Status berhasil disimpan.");
+          } else {
+            showToast(
+              "❌ Gagal menyimpan status: " + result.message,
+              "#f44336"
+            );
+          }
+        } catch (err) {
+          console.error("❌ Error:", err.message);
+          if (
+            err instanceof TypeError &&
+            err.message.includes("Failed to fetch")
+          ) {
+            showToast(
+              "⚠️ Mungkin berhasil, tapi gagal membaca balasan server (CORS).",
+              "#ff9800"
+            );
+          } else {
+            showToast("❌ Gagal koneksi: " + err.message, "#f44336");
+          }
+        } finally {
+          tutupSlip();
+        }
+      }
+
+      function getAngka(rupiah) {
+        const clean = rupiah
+          .replace(/[Rp\s]/g, "") // hapus Rp dan spasi
+          .replace(/\./g, "") // hapus titik ribuan
+          .replace(",", "."); // ubah koma jadi titik
+        return Math.round(parseFloat(clean)) || 0;
+      }
+
+      function formatRupiah(value) {
+        return new Intl.NumberFormat("id-ID", {
+          style: "currency",
+          currency: "IDR",
+        }).format(value);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const tahunSelect = document.getElementById("tahunSelect");
+        const bulanSelect = document.getElementById("bulanSelect");
+        const now = new Date();
+        const tahunIni = now.getFullYear();
+        for (let i = tahunIni - 1; i <= tahunIni + 1; i++) {
+          tahunSelect.innerHTML += `<option value="${i}" ${
+            i === tahunIni ? "selected" : ""
+          }>${i}</option>`;
+        }
+        for (let i = 1; i <= 12; i++) {
+          bulanSelect.innerHTML += `<option value="${i}" ${
+            i === now.getMonth() + 1 ? "selected" : ""
+          }>${i}</option>`;
+        }
+      });
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .then((reg) => console.log("✅ Service Worker aktif:", reg.scope))
+          .catch((err) => console.error("❌ SW error:", err));
+
+        // Auto refresh setelah update
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          console.log("♻️ Versi baru aktif, reload halaman...");
+          window.location.reload();
+        });
+      }
+    </script>
+  </body>
 </html>

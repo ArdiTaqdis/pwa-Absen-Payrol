@@ -295,5 +295,19 @@
         });
       }
     </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .then((reg) => console.log("✅ Service Worker aktif:", reg.scope))
+          .catch((err) => console.error("❌ SW error:", err));
+
+        // Auto refresh setelah update
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          console.log("♻️ Versi baru aktif, reload halaman...");
+          window.location.reload();
+        });
+      }
+    </script>
   </body>
 </html>

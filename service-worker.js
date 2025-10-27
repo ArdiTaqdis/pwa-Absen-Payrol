@@ -1,42 +1,41 @@
-const CACHE_NAME = "absen-sds-v2.25";
+const CACHE_NAME = "sds-snack-v3.5";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./home.html",
+  "./form.html",
+  "./gaji.html",
+  "./rekap.html",
   "./kasir.html",
+  "./slip-admin.html",
+  "./style.css",
   "./print-epson-final.js",
   "./manifest.json",
-  "./logo.png",
-  "./install.html",
-  "./style.css",
-  "./utils.js",
+  "./logo-192.png",
+  "./logo-512.png",
   "./offline.html",
 ];
 
-// === INSTALL ===
+// 🔹 Saat install — cache semua file
 self.addEventListener("install", (event) => {
-  console.log("[SW] Installing...");
+  console.log("[SW] Installing SDS Snack PWA...");
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => {
-        console.log("[SW] Caching app shell...");
-        return cache.addAll(FILES_TO_CACHE);
-      })
-      .catch((err) => console.warn("[SW] Cache failed:", err))
+      .then((cache) => cache.addAll(FILES_TO_CACHE))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-// === ACTIVATE ===
+// 🔹 Saat activate — hapus cache lama
 self.addEventListener("activate", (event) => {
-  console.log("[SW] Activating...");
+  console.log("[SW] Activating SDS Snack PWA...");
   event.waitUntil(
-    caches.keys().then((keyList) =>
+    caches.keys().then((keys) =>
       Promise.all(
-        keyList.map((key) => {
+        keys.map((key) => {
           if (key !== CACHE_NAME) {
-            console.log("[SW] Deleting old cache:", key);
+            console.log("[SW] Hapus cache lama:", key);
             return caches.delete(key);
           }
         })
@@ -46,44 +45,61 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// === FETCH (Stale-While-Revalidate) ===
+// 🔹 Fetch handler — mode hybrid
 self.addEventListener("fetch", (event) => {
-  const url = event.request.url;
+  const { request } = event;
+  const url = request.url;
 
-  // 🛑 Abaikan URL printer atau base64 supaya tidak diblokir
+  // ⚠️ Abaikan permintaan non-GET & URL khusus
   if (
+    request.method !== "GET" ||
     url.startsWith("intent:") ||
     url.includes("rawbt") ||
     url.startsWith("blob:") ||
     url.startsWith("data:")
   ) {
-    console.log("[SW] Bypass special URL:", url);
     return;
   }
 
-  if (event.request.method !== "GET") return;
-
-  event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request).then((response) => {
-        const fetchPromise = fetch(event.request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
+  // 📦 Mode cache-first untuk halaman dan asset lokal
+  if (FILES_TO_CACHE.some((path) => url.endsWith(path.replace("./", "")))) {
+    event.respondWith(
+      caches.match(request).then((response) => {
+        if (response) return response;
+        return fetch(request)
+          .then((netRes) => {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, netRes.clone());
+            });
+            return netRes;
           })
-          .catch(() => response || caches.match("./offline.html"));
-        return response || fetchPromise;
-      });
-    })
-  );
+          .catch(() => caches.match("./offline.html"));
+      })
+    );
+  } else {
+    // 🌐 Stale-while-revalidate untuk API/script luar
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(request).then((response) => {
+          const fetchPromise = fetch(request)
+            .then((netRes) => {
+              if (netRes && netRes.status === 200) {
+                cache.put(request, netRes.clone());
+              }
+              return netRes;
+            })
+            .catch(() => response || caches.match("./offline.html"));
+          return response || fetchPromise;
+        })
+      )
+    );
+  }
 });
 
-// === AUTO UPDATE NOTIFIER ===
-self.addEventListener("message", async (event) => {
+// 🔹 Notifikasi update service worker
+self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
-    console.log("[SW] Skip waiting - activating new version...");
+    console.log("[SW] Skip waiting (update aktif)...");
     self.skipWaiting();
   }
 });

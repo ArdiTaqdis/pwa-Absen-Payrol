@@ -1,294 +1,339 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="theme-color" content="#8067eb">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Absen SDS Snack</title>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #cac1ff;
-      margin: 0;
-      padding: 0;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="theme-color" content="#8067eb" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Absen SDS Snack</title>
+    <script
+      src="https://unpkg.com/html5-qrcode"
+      type="text/javascript"
+    ></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #cac1ff;
+        margin: 0;
+        padding: 0;
+      }
 
-    .judul {
-      background: #8067eb;
-      color: white;
-      padding: 20px;
-      text-align: center;
-      border-bottom: 4px solid #cac1ff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      margin-bottom: 15px;
-    }
+      .judul {
+        background: #8067eb;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-bottom: 4px solid #cac1ff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        margin-bottom: 15px;
+      }
 
-    .judul h1 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
+      .judul h1 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
 
-    .container {
-      background: white;
-      max-width: 460px;
-      margin: auto;
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
+      .container {
+        background: white;
+        max-width: 460px;
+        margin: auto;
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
 
-    .identitas {
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
+      .identitas {
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 15px;
+      }
 
-    #reader {
-      width: 100%;
-      margin: 16px auto;
-    }
+      #reader {
+        width: 100%;
+        margin: 16px auto;
+      }
 
-    button {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      color: white;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-    }
+      button {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        color: white;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+      }
 
-    button[type="button"] {
-      background: #0288d1;
-    }
+      button[type="button"] {
+        background: #0288d1;
+      }
 
-    button[type="button"]:hover {
-      background: #0277bd;
-    }
+      button[type="button"]:hover {
+        background: #0277bd;
+      }
 
-    button[type="submit"] {
-      background: #2e7d32;
-    }
+      button[type="submit"] {
+        background: #2e7d32;
+      }
 
-    button[type="submit"]:hover {
-      background: #1b5e20;
-    }
+      button[type="submit"]:hover {
+        background: #1b5e20;
+      }
 
-    button:active {
-      transform: scale(0.97);
-    }
+      button:active {
+        transform: scale(0.97);
+      }
 
-    #qrResult, #status {
-      text-align: center;
-      font-weight: bold;
-      margin-top: 8px;
-      font-size: 14px;
-    }
+      #qrResult,
+      #status {
+        text-align: center;
+        font-weight: bold;
+        margin-top: 8px;
+        font-size: 14px;
+      }
 
-    #overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.8);
-      z-index: 9999;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.3s ease;
-    }
+      #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.3s ease;
+      }
 
-    #overlay .spinner {
-      border: 6px solid #f3f3f3;
-      border-top: 6px solid #1976d2;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-    }
+      #overlay .spinner {
+        border: 6px solid #f3f3f3;
+        border-top: 6px solid #1976d2;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1s linear infinite;
+      }
 
-    @keyframes spin {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
-</head>
-<body>
-  <div class="judul">
-    <h1>ABSEN SDS SNACK</h1>
-  </div>
-
-  <div class="container">
-    <div class="identitas">
-      <p><b>NIP:</b> <span id="nip">-</span></p>
-      <p><b>Nama:</b> <span id="nama">-</span></p>
-      <p><b>Tanggal:</b> <span id="tanggal">-</span></p>
-      <p><b>Jam:</b> <span id="jam">-</span></p>
-      <p><b>Jenis:</b> <span id="jenis">Pulang</span></p>
-      <p><b>Lokasi:</b> <span id="lokasi">Memuat lokasi...</span></p>
-      <button type="button" onclick="ambilLokasi()">🔄 Refresh Lokasi</button>
-
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="judul">
+      <h1>ABSEN SDS SNACK</h1>
     </div>
 
-    <h3>Scan QR Lokasi Produksi</h3>
-    <div id="reader"></div>
-    <p>Hasil Scan: <b id="qrResult">Belum scan</b></p>
+    <div class="container">
+      <div class="identitas">
+        <p><b>NIP:</b> <span id="nip">-</span></p>
+        <p><b>Nama:</b> <span id="nama">-</span></p>
+        <p><b>Tanggal:</b> <span id="tanggal">-</span></p>
+        <p><b>Jam:</b> <span id="jam">-</span></p>
+        <p><b>Jenis:</b> <span id="jenis">Pulang</span></p>
+        <p><b>Lokasi:</b> <span id="lokasi">Memuat lokasi...</span></p>
+        <button type="button" onclick="ambilLokasi()">🔄 Refresh Lokasi</button>
+      </div>
 
-    <button type="submit" onclick="kirimAbsen()">✅ Kirim Absensi</button>
-    <p id="status"></p>
-  </div>
+      <h3>Scan QR Lokasi Produksi</h3>
+      <div id="reader"></div>
+      <p>Hasil Scan: <b id="qrResult">Belum scan</b></p>
 
-  <div id="overlay"><div class="spinner"></div></div>
+      <button type="submit" onclick="kirimAbsen()">✅ Kirim Absensi</button>
+      <p id="status"></p>
+    </div>
 
-  <script>
-    localStorage.removeItem("qrCode"); // 🔁 Reset QR lama
-    const params = new URLSearchParams(window.location.search);
-    const nip = params.get("nip") || "-";
-    const nama = params.get("nama") || "-";
+    <div id="overlay"><div class="spinner"></div></div>
 
-    document.getElementById("nip").textContent = nip;
-    document.getElementById("nama").textContent = nama;
+    <script>
+      localStorage.removeItem("qrCode"); // 🔁 Reset QR lama
+      const params = new URLSearchParams(window.location.search);
+      const nip = params.get("nip") || "-";
+      const nama = params.get("nama") || "-";
 
-    const now = new Date();
-    const dd = String(now.getDate()).padStart(2, '0');
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
-    const yyyy = now.getFullYear();
-    const formatted = `${dd}/${mm}/${yyyy}`;
+      document.getElementById("nip").textContent = nip;
+      document.getElementById("nama").textContent = nama;
 
-    document.getElementById("tanggal").textContent = formatted;
-    // document.getElementById("tanggal").textContent = now.toLocaleDateString("id-ID");
-    document.getElementById("jam").textContent = now.toLocaleTimeString("id-ID");
-    document.getElementById("jenis").textContent = now.getHours() < 12 ? "Masuk" : "Pulang";
+      const now = new Date();
+      const dd = String(now.getDate()).padStart(2, "0");
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const yyyy = now.getFullYear();
+      const formatted = `${dd}/${mm}/${yyyy}`;
 
-   
+      document.getElementById("tanggal").textContent = formatted;
+      // document.getElementById("tanggal").textContent = now.toLocaleDateString("id-ID");
+      document.getElementById("jam").textContent =
+        now.toLocaleTimeString("id-ID");
+      document.getElementById("jenis").textContent =
+        now.getHours() < 12 ? "Masuk" : "Pulang";
 
+      let scanner;
 
-    let scanner;
-
-    function onScanSuccess(decodedText) {
-      document.getElementById("qrResult").textContent = decodedText;
-      localStorage.setItem("qrCode", decodedText);
-      scanner.stop().then(() => {
-        document.getElementById("status").textContent = "";
-      });
-    }
-
-    function ambilLokasi() {
-      document.getElementById("lokasi").textContent = "Memuat lokasi...";
-
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const { latitude, longitude } = pos.coords;
-          fetch(`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`)
-            .then(res => res.json())
-            .then(data => {
-              document.getElementById("lokasi").textContent = data.display_name;
-            })
-            .catch(() => {
-              document.getElementById("lokasi").textContent = "Tidak bisa membaca lokasi.";
-            });
-        },
-        () => {
-          document.getElementById("lokasi").textContent = "Belum aktif";
-        }
-      );
-    }
-
-    ambilLokasi();
-
-    Html5Qrcode.getCameras().then(devices => {
-      if (devices && devices.length) {
-        const backCam = devices.find(d => d.label.toLowerCase().includes('back')) || devices[0];
-        scanner = new Html5Qrcode("reader");
-        scanner.start(
-          backCam.id,
-          { fps: 10, qrbox: 250 },
-          onScanSuccess,
-          errorMsg => {}
-        ).catch(err => {
-          console.error("Gagal memulai kamera:", err);
-          document.getElementById("qrResult").textContent = "❌ Tidak dapat membuka kamera.";
+      function onScanSuccess(decodedText) {
+        document.getElementById("qrResult").textContent = decodedText;
+        localStorage.setItem("qrCode", decodedText);
+        scanner.stop().then(() => {
+          document.getElementById("status").textContent = "";
         });
-      } else {
-        document.getElementById("qrResult").textContent = "❌ Kamera tidak ditemukan.";
       }
-    }).catch(err => {
-      console.error("Gagal mendapatkan kamera:", err);
-      document.getElementById("qrResult").textContent = "❌ Akses kamera ditolak.";
-    });
 
-    function showLoading(show) {
-      document.getElementById("overlay").style.display = show ? "flex" : "none";
-    }
+      function ambilLokasi() {
+        document.getElementById("lokasi").textContent = "Memuat lokasi...";
 
-  function kirimAbsen() {
-    const lokasi = document.getElementById("lokasi").textContent;
-    const qrCode = localStorage.getItem("qrCode") || "";
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const { latitude, longitude } = pos.coords;
+            fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            )
+              .then((res) => res.json())
+              .then((data) => {
+                document.getElementById("lokasi").textContent =
+                  data.display_name;
+              })
+              .catch(() => {
+                document.getElementById("lokasi").textContent =
+                  "Tidak bisa membaca lokasi.";
+              });
+          },
+          () => {
+            document.getElementById("lokasi").textContent = "Belum aktif";
+          }
+        );
+      }
 
-    if (lokasi === "Belum aktif" || lokasi.includes("Memuat") || lokasi.includes("Tidak bisa")) {
-      alert("❌ Lokasi belum diaktifkan. Aktifkan GPS Anda dan coba lagi.");
-      return;
-    }
+      ambilLokasi();
 
-    if (!qrCode || qrCode !== "001-SDS Snack") {
-      alert("❌ QR Code tidak valid. Scan ulang.");
-      return;
-    }
+      Html5Qrcode.getCameras()
+        .then((devices) => {
+          if (devices && devices.length) {
+            const backCam =
+              devices.find((d) => d.label.toLowerCase().includes("back")) ||
+              devices[0];
+            scanner = new Html5Qrcode("reader");
+            scanner
+              .start(
+                backCam.id,
+                { fps: 10, qrbox: 250 },
+                onScanSuccess,
+                (errorMsg) => {}
+              )
+              .catch((err) => {
+                console.error("Gagal memulai kamera:", err);
+                document.getElementById("qrResult").textContent =
+                  "❌ Tidak dapat membuka kamera.";
+              });
+          } else {
+            document.getElementById("qrResult").textContent =
+              "❌ Kamera tidak ditemukan.";
+          }
+        })
+        .catch((err) => {
+          console.error("Gagal mendapatkan kamera:", err);
+          document.getElementById("qrResult").textContent =
+            "❌ Akses kamera ditolak.";
+        });
 
-    const data = {
-      nip,
-      nama,
-      tanggal: document.getElementById("tanggal").textContent,
-      jam: document.getElementById("jam").textContent,
-      jenis: document.getElementById("jenis").textContent,
-      lokasi,
-      qrCode
-    };
+      function showLoading(show) {
+        document.getElementById("overlay").style.display = show
+          ? "flex"
+          : "none";
+      }
 
-    showLoading(true);
+      function kirimAbsen() {
+        const lokasi = document.getElementById("lokasi").textContent;
+        const qrCode = localStorage.getItem("qrCode") || "";
 
-  fetch("https://script.google.com/macros/s/AKfycbwA0_4HB-27LjSV6B3Ce1N7xl_R8lO72n8gaBjOm1a8y2ZbDnGHB8ur2pGBufk4Wf3O/exec", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: new URLSearchParams(data)
-  })
-  .then(res => {
-    showLoading(false);
-    return res.json();
-  })
-  .then(res => {
-    if (res.status === "success") {
-      alert("✅ Absen berhasil!");
-      window.location.href = "home.html";
-    } else {
-      alert("❌ Gagal: " + res.message);
-    }
-  })
-  .catch(err => {
-    showLoading(false);
-    console.warn("⚠️ Error saat fetch:", err.message);
+        if (
+          lokasi === "Belum aktif" ||
+          lokasi.includes("Memuat") ||
+          lokasi.includes("Tidak bisa")
+        ) {
+          alert("❌ Lokasi belum diaktifkan. Aktifkan GPS Anda dan coba lagi.");
+          return;
+        }
 
-    // Deteksi kemungkinan error CORS
-    if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
-      alert("✅ Absen Berhasil terkirim, lihat menu Rekap yaa... Anda akan diarahkan ke beranda.");
-      window.location.href = "home.html";
-    } else {
-      alert("❌ Gagal terhubung ke server: " + err.message);
-    }
-  });
-}
+        if (!qrCode || qrCode !== "001-SDS Snack") {
+          alert("❌ QR Code tidak valid. Scan ulang.");
+          return;
+        }
 
-  </script>
+        const data = {
+          nip,
+          nama,
+          tanggal: document.getElementById("tanggal").textContent,
+          jam: document.getElementById("jam").textContent,
+          jenis: document.getElementById("jenis").textContent,
+          lokasi,
+          qrCode,
+        };
 
+        showLoading(true);
 
-</body>
+        fetch(
+          "https://script.google.com/macros/s/AKfycbwA0_4HB-27LjSV6B3Ce1N7xl_R8lO72n8gaBjOm1a8y2ZbDnGHB8ur2pGBufk4Wf3O/exec",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(data),
+          }
+        )
+          .then((res) => {
+            showLoading(false);
+            return res.json();
+          })
+          .then((res) => {
+            if (res.status === "success") {
+              alert("✅ Absen berhasil!");
+              window.location.href = "home.html";
+            } else {
+              alert("❌ Gagal: " + res.message);
+            }
+          })
+          .catch((err) => {
+            showLoading(false);
+            console.warn("⚠️ Error saat fetch:", err.message);
+
+            // Deteksi kemungkinan error CORS
+            if (
+              err instanceof TypeError &&
+              err.message.includes("Failed to fetch")
+            ) {
+              alert(
+                "✅ Absen Berhasil terkirim, lihat menu Rekap yaa... Anda akan diarahkan ke beranda."
+              );
+              window.location.href = "home.html";
+            } else {
+              alert("❌ Gagal terhubung ke server: " + err.message);
+            }
+          });
+      }
+    </script>
+
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .then((reg) => console.log("✅ Service Worker aktif:", reg.scope))
+          .catch((err) => console.error("❌ SW error:", err));
+
+        // Auto refresh setelah update
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          console.log("♻️ Versi baru aktif, reload halaman...");
+          window.location.reload();
+        });
+      }
+    </script>
+  </body>
 </html>
