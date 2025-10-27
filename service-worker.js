@@ -1,60 +1,89 @@
-const CACHE_NAME = "absen-sds-v2.19"; // ✅ Ganti versi saat ada update
+const CACHE_NAME = "absen-sds-v2.21";
 const FILES_TO_CACHE = [
-  "/",
-  "index.html",
-  "home.html",
-  "kasir.html",
-  "print-rawbt-final.js",
-  "manifest.json",
-  "logo.png",
-  "install.html",
-  "style.css",
-  "utils.js",
+  "./",
+  "./index.html",
+  "./home.html",
+  "./kasir.html",
+  "./print-rawbt-final.js",
+  "./manifest.json",
+  "./logo.png",
+  "./install.html",
+  "./style.css",
+  "./utils.js",
+  "./offline.html",
 ];
 
-// 📦 Install Service Worker dan simpan cache
+// === INSTALL ===
 self.addEventListener("install", (event) => {
   console.log("[SW] Installing...");
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("[SW] Caching app shell...");
-      return cache.addAll(FILES_TO_CACHE);
-    })
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => {
+        console.log("[SW] Caching app shell...");
+        return cache.addAll(FILES_TO_CACHE);
+      })
+      .catch((err) => console.warn("[SW] Cache failed:", err))
   );
   self.skipWaiting();
 });
 
-// 🔁 Activate Service Worker dan hapus cache lama
+// === ACTIVATE ===
 self.addEventListener("activate", (event) => {
   console.log("[SW] Activating...");
   event.waitUntil(
-    caches.keys().then((keyList) => {
-      return Promise.all(
+    caches.keys().then((keyList) =>
+      Promise.all(
         keyList.map((key) => {
           if (key !== CACHE_NAME) {
             console.log("[SW] Deleting old cache:", key);
             return caches.delete(key);
           }
         })
-      );
-    })
+      )
+    )
   );
   self.clients.claim();
 });
 
-// 🌐 Intercept fetch request
+// === FETCH (Stale-While-Revalidate) ===
 self.addEventListener("fetch", (event) => {
+  const url = event.request.url;
+
+  // 🛑 Abaikan URL printer atau base64 supaya tidak diblokir
+  if (
+    url.startsWith("intent:") ||
+    url.includes("rawbt") ||
+    url.startsWith("blob:") ||
+    url.startsWith("data:")
+  ) {
+    console.log("[SW] Bypass special URL:", url);
+    return;
+  }
+
   if (event.request.method !== "GET") return;
 
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return (
-        response ||
-        fetch(event.request).catch(() => {
-          // Offline fallback: bisa arahkan ke halaman offline.html jika mau
-          return caches.match("index.html");
-        })
-      );
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.match(event.request).then((response) => {
+        const fetchPromise = fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          })
+          .catch(() => response || caches.match("./offline.html"));
+        return response || fetchPromise;
+      });
     })
   );
+});
+
+// === AUTO UPDATE NOTIFIER ===
+self.addEventListener("message", async (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    console.log("[SW] Skip waiting - activating new version...");
+    self.skipWaiting();
+  }
 });
