@@ -296,5 +296,16 @@
         }
       }
     </script>
+    <script>
+      // ✅ Registrasi Service Worker PWA
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("./service-worker.js")
+          .then((reg) =>
+            console.log("✅ SW aktif di halaman kasir:", reg.scope)
+          )
+          .catch((err) => console.error("❌ SW error:", err));
+      }
+    </script>
   </body>
 </html>

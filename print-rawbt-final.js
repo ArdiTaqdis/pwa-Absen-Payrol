@@ -1,56 +1,54 @@
-// === SDS SNACK RawBT LAN (Epson TM-T82 TCP Mode) ===
-function printStrukRawBT(data) {
+// === SDS SNACK PRINT MODULE v3.0 ===
+// Versi Final — Tanpa Base64, Tanpa Foto, Aman di Semua RawBT
+
+function line() {
+  return "------------------------------------------\n";
+}
+
+async function printStrukRawBT(data) {
   try {
-    const ESC = "\x1B";
-    const GS = "\x1D";
-    const LF = "\x0A";
-
-    // Format ESC/POS basic
-    const alignLeft = (t) => ESC + "\x61\x00" + t;
-    const alignCenter = (t) => ESC + "\x61\x01" + t;
-    const alignRight = (t) => ESC + "\x61\x02" + t;
-    const boldOn = () => ESC + "\x45\x01";
-    const boldOff = () => ESC + "\x45\x00";
-
+    const { items, total, tanggal, namaKasir } = data;
     let text = "";
-    text += ESC + "@"; // Initialize printer
-    text += alignCenter(boldOn() + "SDS SNACK\n" + boldOff());
-    text += alignCenter("Menerima Pesanan Snack Box,\n");
-    text += alignCenter("Aneka Kue dan Roti\n");
-    text += alignCenter("--------------------------------\n");
-    text += alignCenter("Jln Raya Dieng Km 17 Kejajar Wonosobo 56354\n");
-    text += alignCenter("Tlp/WA: 0823-2806-6205\n");
-    text += alignCenter("--------------------------------\n");
-    text += alignLeft("Tanggal: " + data.tanggal + "\n");
-    text += alignCenter("--------------------------------\n");
 
-    data.items.forEach((item) => {
-      const total = item.harga * item.qty;
-      text += alignLeft(
-        `${item.nama}\n${
-          item.qty
-        } x ${item.harga.toLocaleString()} = ${total.toLocaleString()}\n`
-      );
+    // === HEADER TOKO ===
+    text += "           SDS SNACK\n";
+    text += "  Menerima Pesanan Snack Box,\n";
+    text += "     Aneka Kue dan Roti\n";
+    text += " Jln Raya Dieng Km 17 Kejajar\n";
+    text += "      Wonosobo 56354\n";
+    text += "   Telp/WA: 082328066205\n";
+    text += line();
+    text += `Tanggal : ${tanggal}\n`;
+    if (namaKasir) text += `Kasir   : ${namaKasir}\n`;
+    text += line();
+
+    // === ITEM LIST ===
+    items.forEach((item) => {
+      text += `${item.nama}\n`;
+      text += `${item.qty} x ${item.harga.toLocaleString(
+        "id-ID"
+      )} = ${item.jumlah.toLocaleString("id-ID")}\n`;
     });
 
-    text += alignCenter("--------------------------------\n");
-    text += boldOn();
-    text += alignRight("TOTAL: Rp " + data.total.toLocaleString() + "\n");
-    text += boldOff();
-    text += alignCenter("--------------------------------\n");
-    text += alignCenter("Terima Kasih 🙏\n");
-    text += alignCenter("Selamat Menikmati!\n");
-    text += LF.repeat(3);
-    text += GS + "V" + "\x00"; // Cut paper
+    text += line();
+    text += `TOTAL : Rp ${total.toLocaleString("id-ID")}\n`;
+    text += line();
 
-    // Konversi ke base64 untuk dikirim ke RawBT LAN
-    const b64 = btoa(unescape(encodeURIComponent(text)));
+    // === FOOTER ===
+    text += "        Terima Kasih\n";
+    text += "       Selamat Menikmati\n";
+    text += " Follow IG: @sdssnack.official\n";
+    text += "\n\n\n\n"; // feed paper keluar
 
-    // URL RawBT LAN printer
-    const url = `rawbt://print?data=${b64}`;
+    // === KIRIM KE RAWBT (Mode Text Aman) ===
+    const encodedText = encodeURIComponent(text);
+    const printUrl = `intent:rawbtprint#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
 
-    window.location.href = url;
-  } catch (e) {
-    alert("❌ Gagal mencetak via RawBT LAN: " + e.message);
+    console.log("[PRINT] Mengirim teks ke RawBT...");
+    setTimeout(() => {
+      window.location.href = printUrl;
+    }, 500); // delay kecil biar Android sempat proses
+  } catch (err) {
+    alert("❌ Gagal mencetak: " + err.message);
   }
 }
