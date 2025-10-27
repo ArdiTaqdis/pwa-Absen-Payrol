@@ -1,10 +1,10 @@
-const CACHE_NAME = "absen-sds-v2.23";
+const CACHE_NAME = "absen-sds-v2.24";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./home.html",
   "./kasir.html",
-  "./print-rawbt-final.js",
+  "./print-epson-final.js",
   "./manifest.json",
   "./logo.png",
   "./install.html",

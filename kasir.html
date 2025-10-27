@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SDS SNACK - Kasir Penjualan</title>
 
-    <!-- 🔹 Load file print-rawbt-final.js -->
-    <script src="print-rawbt-final.js" defer></script>
+    <!-- 🔹 Epson SDK -->
+    <script src="https://epson.github.io/epos-print-sdk/epos-print.js"></script>
+
+    <!-- 🔹 Modul Printer Epson -->
+    <script src="print-epson-final.js" defer></script>
 
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#8067eb" />
-    <script
-      src="https://epson.github.io/epos-print-sdk/epos-print.js"
-      async
-      defer
-    ></script>
 
     <style>
       :root {
@@ -170,6 +168,7 @@
       }
     </style>
   </head>
+
   <body>
     <h2>💜 SDS SNACK<br /><small>Kasir Penjualan Toko Kue & Roti</small></h2>
 
@@ -179,7 +178,7 @@
       <label>Harga (Rp)</label>
       <input type="number" id="itemPrice" placeholder="5000" />
       <label>Qty</label>
-      <input type="number" id="itemQty" placeholder="1" />
+      <input type="number" id="itemQty" placeholder="1" value="1" />
 
       <button class="add-btn" onclick="tambahItem()">+ Tambah Item</button>
 
@@ -215,19 +214,16 @@
       let items = [];
       let total = 0;
       let printerIP = localStorage.getItem("printerIP") || "-";
-
       document.getElementById("ipLabel").textContent = printerIP;
 
       function tambahItem() {
         const nama = document.getElementById("itemName").value.trim();
         const harga = parseInt(document.getElementById("itemPrice").value);
         const qty = parseInt(document.getElementById("itemQty").value);
-
         if (!nama || !harga || !qty || harga <= 0 || qty <= 0) {
           alert("⚠️ Lengkapi data item dengan benar!");
           return;
         }
-
         const jumlah = harga * qty;
         items.push({ nama, harga, qty, jumlah });
         updateTabel();
@@ -243,7 +239,6 @@
         const tbody = document.querySelector("#itemTable tbody");
         tbody.innerHTML = "";
         total = 0;
-
         items.forEach((item, i) => {
           total += item.jumlah;
           tbody.innerHTML += `
@@ -256,7 +251,6 @@
             </tr>
           `;
         });
-
         document.getElementById("totalBayar").textContent =
           total.toLocaleString();
       }
@@ -282,20 +276,20 @@
           return;
         }
 
+        const namaKasir = localStorage.getItem("nama") || "Kasir";
         const data = {
           items,
           total,
           tanggal: new Date().toLocaleString("id-ID"),
+          namaKasir,
         };
 
-        // ✅ Kirim ke RawBT (Android)
-        if (typeof printStrukRawBT === "function") {
-          printStrukRawBT(data);
-        } else {
-          window.print();
-        }
+        const printerIP = localStorage.getItem("printerIP") || "192.168.1.150";
+        document.getElementById("status").textContent = "🔄 Mencetak struk...";
+        printStrukEpsonLAN(printerIP, data);
       }
     </script>
+
     <script>
       // ✅ Registrasi Service Worker PWA
       if ("serviceWorker" in navigator) {
