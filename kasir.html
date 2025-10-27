@@ -134,14 +134,26 @@
       <small>Printer IP: <span id="ipLabel">-</span></small
       ><br />
       <button onclick="aturPrinter()">⚙️ Atur Printer</button>
-      <button class="print-btn" onclick="printStruk()">🖨 Cetak Struk</button>
+
+      <button
+        class="print-btn"
+        onclick="printStrukEpsonLAN(printerIP, { 
+        tanggal: new Date().toLocaleString('id-ID'),
+        namaKasir: localStorage.getItem('nama') || 'Kasir SDS Snack',
+        items: items,
+        total: total
+      })"
+      >
+        🖨 Cetak Struk
+      </button>
 
       <div id="status" class="status"></div>
     </div>
 
     <footer>© 2025 SDS Snack | Struk 58mm</footer>
 
-    <script src="epos-print.js"></script>
+    <script src="print-epson-final.js"></script>
+    <!-- <script src="epos-print.js"></script> -->
     <script>
       let items = [];
       let total = 0;
@@ -153,9 +165,19 @@
         const harga = parseInt(itemPrice.value);
         const qty = parseInt(itemQty.value);
         if (!nama || !harga || !qty) return alert("Lengkapi data item!");
+
         items.push({ nama, harga, qty, jumlah: harga * qty });
         updateTabel();
+
+        // 🔁 Kosongkan form setelah tambah
+        itemName.value = "";
+        itemPrice.value = "";
+        itemQty.value = 1;
+
+        // Fokus lagi ke input nama biar cepat input item berikutnya
+        itemName.focus();
       }
+
       function hapusItem(i) {
         items.splice(i, 1);
         updateTabel();
