@@ -6,7 +6,15 @@
     <title>SDS SNACK - Kasir Penjualan</title>
 
     <!-- 🔹 Epson SDK -->
-    <script src="https://epson.github.io/epos-print-sdk/epos-print.js"></script>
+    <!-- 🔹 Load Epson SDK + Auto check -->
+    <script
+      src="https://epson.github.io/epos-print-sdk/epos-print.js"
+      onload="console.log('✅ Epson SDK Loaded!')"
+      onerror="alert('❌ Gagal memuat SDK Epson! Pastikan online.')"
+    ></script>
+
+    <!-- 🔹 Modul Printer Epson -->
+    <script src="print-epson-final.js" defer></script>
 
     <!-- 🔹 Modul Printer Epson -->
     <script src="print-epson-final.js" defer></script>

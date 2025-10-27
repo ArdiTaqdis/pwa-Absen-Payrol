@@ -1,4 +1,4 @@
-const CACHE_NAME = "absen-sds-v2.24";
+const CACHE_NAME = "absen-sds-v2.25";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",

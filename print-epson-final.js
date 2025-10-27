@@ -1,13 +1,28 @@
 // === SDS SNACK PRINT MODULE - EPSON LAN ===
-// Versi stabil 100% tanpa RawBT (langsung ke IP printer)
+// Versi 4.0 — Auto Check SDK & Auto Retry Koneksi
+// Kompatibel Epson TM-T82 LAN / Wi-Fi
+// Dibuat khusus untuk SDS SNACK
 
-async function printStrukEpsonLAN(printerIP, data) {
+window.printStrukEpsonLAN = async function (printerIP, data) {
+  // Pastikan SDK Epson siap
+  if (typeof epson === "undefined" || !epson.ePOSDevice) {
+    console.warn("[EPSON] SDK belum siap. Menunggu 2 detik...");
+    document.getElementById("status").textContent =
+      "⏳ Menunggu SDK Epson siap...";
+    setTimeout(() => {
+      printStrukEpsonLAN(printerIP, data);
+    }, 2000);
+    return;
+  }
+
   try {
     const epos = new epson.ePOSDevice();
     const port = 8008;
     const deviceId = "local_printer";
 
     console.log(`[EPSON] Menghubungkan ke printer ${printerIP}:${port} ...`);
+    const statusElem = document.getElementById("status");
+    if (statusElem) statusElem.textContent = "🔄 Menghubungkan printer...";
 
     epos.connect(printerIP, port, (connectResult) => {
       if (connectResult === "OK" || connectResult === "SSL_CONNECT_OK") {
@@ -18,9 +33,11 @@ async function printStrukEpsonLAN(printerIP, data) {
           epos.DEVICE_TYPE_PRINTER,
           { crypto: false, buffer: false },
           (printer, error) => {
-            if (error) {
+            if (error || !printer) {
               console.error("[EPSON] Gagal membuat device:", error);
               alert("❌ Tidak dapat membuat koneksi ke printer.");
+              if (statusElem)
+                statusElem.textContent = "❌ Gagal koneksi printer.";
               return;
             }
 
@@ -42,7 +59,7 @@ async function printStrukEpsonLAN(printerIP, data) {
               builder.addText(`Kasir   : ${data.namaKasir}\n`);
             builder.addText("------------------------------------------\n");
 
-            // === ITEM LIST ===
+            // === ISI ITEM ===
             data.items.forEach((item) => {
               builder.addText(`${item.nama}\n`);
               builder.addText(
@@ -66,24 +83,31 @@ async function printStrukEpsonLAN(printerIP, data) {
             builder.addText("Follow IG: @sdssnack.official\n\n");
             builder.addCut(builder.CUT_FEED);
 
+            // === KIRIM KE PRINTER ===
+            console.log("[EPSON] Mengirim struk ke printer...");
             printer.send(builder.toString());
             epos.disconnect();
 
-            console.log("[EPSON] Struk terkirim dan koneksi ditutup.");
-            document.getElementById("status").textContent =
-              "✅ Struk berhasil dicetak.";
+            console.log("[EPSON] Struk terkirim & koneksi ditutup.");
+            if (statusElem)
+              statusElem.textContent = "✅ Struk berhasil dicetak.";
           }
         );
       } else {
-        alert("❌ Gagal konek ke printer. Pastikan IP benar & ePOS aktif.");
-        console.error("[EPSON] Gagal koneksi:", connectResult);
-        document.getElementById("status").textContent =
-          "❌ Printer tidak ditemukan.";
+        console.warn("[EPSON] Gagal koneksi:", connectResult);
+        if (statusElem)
+          statusElem.textContent =
+            "⚠️ Printer tidak merespons, mencoba ulang...";
+        // Auto retry
+        setTimeout(() => {
+          printStrukEpsonLAN(printerIP, data);
+        }, 3000);
       }
     });
   } catch (err) {
     console.error("[EPSON ERROR]", err);
     alert("❌ Terjadi error: " + err.message);
-    document.getElementById("status").textContent = "❌ Error koneksi printer.";
+    const statusElem = document.getElementById("status");
+    if (statusElem) statusElem.textContent = "❌ Error koneksi printer.";
   }
-}
+};
