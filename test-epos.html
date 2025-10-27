@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./epos-print.js"></script>
+
+    <title>🧾 Test Print - SDS SNACK (Epson LAN)</title>
+
+    <!-- 🔹 Epson SDK -->
+    <script
+      src="https://epson.github.io/epos-print-sdk/epos-print.js"
+      onload="console.log('✅ Epson SDK loaded!')"
+      onerror="alert('❌ Gagal memuat SDK Epson! Pastikan online dan koneksi stabil.')"
+    ></script>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f6f5ff;
+        color: #333;
+        padding: 20px;
+        text-align: center;
+      }
+      h1 {
+        color: #8067eb;
+      }
+      input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        width: 70%;
+        font-size: 1rem;
+      }
+      button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        background: #8067eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      button:hover {
+        background: #6a54d4;
+      }
+      #status {
+        margin-top: 15px;
+        color: #555;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧾 Test Print Epson LAN</h1>
+    <p>Masukkan IP Printer Epson kamu (contoh: <b>192.168.1.150</b>)</p>
+    <input type="text" id="ip" value="192.168.1.150" />
+    <br />
+    <button onclick="testPrint()">🖨 Kirim Test Print</button>
+    <div id="status">Menunggu perintah...</div>
+
+    <script>
+      let sdkReady = false;
+
+      // ✅ Pastikan SDK siap sebelum apapun dijalankan
+      function checkEpsonSDK(retry = 0) {
+        if (typeof epson !== "undefined" && epson.ePOSDevice) {
+          console.log("✅ Epson SDK siap digunakan!");
+          sdkReady = true;
+          document.getElementById("status").textContent =
+            "✅ Epson SDK siap, silakan test print.";
+        } else {
+          if (retry < 10) {
+            console.log("⏳ Menunggu SDK Epson siap... percobaan:", retry + 1);
+            setTimeout(() => checkEpsonSDK(retry + 1), 500);
+          } else {
+            console.warn("❌ SDK Epson tidak tersedia.");
+            document.getElementById("status").textContent =
+              "❌ SDK Epson gagal dimuat. Coba reload halaman atau pastikan koneksi internet stabil.";
+          }
+        }
+      }
+
+      // Panggil saat halaman selesai dimuat
+      window.addEventListener("load", () => {
+        checkEpsonSDK();
+      });
+
+      async function testPrint() {
+        const ip = document.getElementById("ip").value.trim();
+        const statusEl = document.getElementById("status");
+
+        if (!sdkReady) {
+          alert(
+            "❌ SDK Epson belum siap. Tunggu beberapa detik lalu coba lagi."
+          );
+          return;
+        }
+
+        if (!ip) {
+          alert("Masukkan IP printer dulu bro!");
+          return;
+        }
+
+        statusEl.textContent = "🔄 Menghubungkan ke printer...";
+
+        try {
+          const epos = new epson.ePOSDevice();
+          const port = 8008;
+          const deviceId = "local_printer";
+
+          epos.connect(ip, port, (resultConnect) => {
+            if (resultConnect === "OK" || resultConnect === "SSL_CONNECT_OK") {
+              epos.createDevice(
+                deviceId,
+                epos.DEVICE_TYPE_PRINTER,
+                { crypto: false, buffer: false },
+                (printer, error) => {
+                  if (error || !printer) {
+                    console.error("Gagal membuat device:", error);
+                    statusEl.textContent = "❌ Gagal koneksi printer.";
+                    return;
+                  }
+
+                  const builder = new epson.ePOSBuilder();
+                  builder.addTextAlign(builder.ALIGN_CENTER);
+                  builder.addText("=== TEST PRINT SDS SNACK ===\n");
+                  builder.addText("Printer Epson Siap ✅\n");
+                  builder.addText("Terhubung ke: " + ip + "\n");
+                  builder.addText("-------------------------------\n");
+                  builder.addText(
+                    "Tanggal : " + new Date().toLocaleString("id-ID") + "\n"
+                  );
+                  builder.addText("Cetak Berhasil! 🎉\n\n\n");
+                  builder.addCut(builder.CUT_FEED);
+
+                  printer.send(builder.toString());
+                  epos.disconnect();
+
+                  console.log("✅ Test print berhasil dikirim!");
+                  statusEl.textContent =
+                    "✅ Struk test berhasil dikirim ke printer!";
+                }
+              );
+            } else {
+              console.error("❌ Gagal konek:", resultConnect);
+              statusEl.textContent =
+                "❌ Gagal konek ke printer. Pastikan IP benar & ePOS aktif.";
+            }
+          });
+        } catch (err) {
+          console.error("EPSON ERROR:", err);
+          statusEl.textContent = "❌ Error: " + err.message;
+        }
+      }
+    </script>
+  </body>
+</html>

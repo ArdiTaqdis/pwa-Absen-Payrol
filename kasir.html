@@ -3,21 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SDS SNACK - Kasir Penjualan</title>
-
-    <!-- 🔹 Epson SDK -->
-    <!-- 🔹 Load Epson SDK + Auto check -->
-    <script
-      src="https://epson.github.io/epos-print-sdk/epos-print.js"
-      onload="console.log('✅ Epson SDK Loaded!')"
-      onerror="alert('❌ Gagal memuat SDK Epson! Pastikan online.')"
-    ></script>
-
-    <!-- 🔹 Modul Printer Epson -->
-    <script src="print-epson-final.js" defer></script>
-
-    <!-- 🔹 Modul Printer Epson -->
-    <script src="print-epson-final.js" defer></script>
+    <title>SDS SNACK - Kasir Penjualan 58mm</title>
 
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#8067eb" />
@@ -25,12 +11,9 @@
     <style>
       :root {
         --ungu: #8067eb;
-        --ungu-muda: #cac1ff;
         --ungu-gelap: #6f56d9;
-        --putih: #ffffff;
         --bg: #f9f8ff;
       }
-
       body {
         font-family: "Segoe UI", sans-serif;
         background: var(--bg);
@@ -38,65 +21,46 @@
         padding: 20px;
         color: #333;
       }
-
       h2 {
         text-align: center;
         color: var(--ungu);
-        margin-bottom: 0;
       }
-
-      small {
-        color: #777;
-      }
-
       .kasir-box {
         max-width: 480px;
         margin: 20px auto;
-        background: var(--putih);
-        border-radius: 16px;
-        padding: 20px;
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
       }
-
       label {
         font-weight: 600;
         color: var(--ungu-gelap);
       }
-
       input {
         width: 100%;
-        padding: 10px;
-        margin: 6px 0 12px;
+        padding: 8px;
+        margin: 4px 0 10px;
         border: 1px solid #ccc;
-        border-radius: 8px;
+        border-radius: 6px;
         font-size: 1rem;
-        outline: none;
       }
-
-      input:focus {
-        border-color: var(--ungu);
-        box-shadow: 0 0 4px rgba(128, 103, 235, 0.4);
-      }
-
       table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
       }
-
       th,
       td {
         border: 1px solid #e4dfff;
-        padding: 8px;
+        padding: 6px;
         text-align: center;
       }
-
       th {
         background: var(--ungu);
         color: white;
       }
-
       button {
         padding: 10px;
         border: none;
@@ -105,88 +69,50 @@
         font-weight: bold;
         transition: 0.2s;
       }
-
       .add-btn {
         background: #6ed37f;
         color: white;
         width: 100%;
-        margin-top: 10px;
       }
-
       .add-btn:hover {
         background: #53b86a;
       }
-
       .print-btn {
         background: var(--ungu);
         color: white;
         width: 100%;
-        margin-top: 20px;
+        margin-top: 10px;
       }
-
-      .print-btn:hover {
-        background: var(--ungu-gelap);
-      }
-
       .hapus-btn {
         background: #f87171;
         color: white;
         border: none;
-        border-radius: 6px;
-        padding: 4px 8px;
+        border-radius: 4px;
+        padding: 3px 6px;
         cursor: pointer;
       }
-
-      .hapus-btn:hover {
-        background: #dc2626;
-      }
-
       .status {
         margin-top: 10px;
         text-align: center;
         font-size: 0.9em;
-        color: #555;
       }
-
-      #configBox {
-        margin-top: 15px;
-        text-align: center;
-      }
-
-      #configBox small {
-        display: block;
-        margin-bottom: 5px;
-        color: #666;
-      }
-
       footer {
         text-align: center;
         font-size: 0.8rem;
         color: #888;
         margin-top: 20px;
       }
-
-      .back-btn {
-        margin-top: 20px;
-        text-align: center;
-        display: block;
-        color: var(--ungu);
-        font-weight: bold;
-        text-decoration: none;
-      }
     </style>
   </head>
-
   <body>
-    <h2>💜 SDS SNACK<br /><small>Kasir Penjualan Toko Kue & Roti</small></h2>
-
+    <h2>💜 SDS SNACK<br /><small>Kasir Penjualan 58mm</small></h2>
     <div class="kasir-box">
       <label>Nama Item</label>
       <input type="text" id="itemName" placeholder="Contoh: Roti Coklat" />
       <label>Harga (Rp)</label>
       <input type="number" id="itemPrice" placeholder="5000" />
       <label>Qty</label>
-      <input type="number" id="itemQty" placeholder="1" value="1" />
+      <input type="number" id="itemQty" value="1" />
 
       <button class="add-btn" onclick="tambahItem()">+ Tambah Item</button>
 
@@ -194,10 +120,10 @@
         <thead>
           <tr>
             <th>Item</th>
-            <th>Harga</th>
             <th>Qty</th>
+            <th>Harga</th>
             <th>Jumlah</th>
-            <th>Aksi</th>
+            <th>X</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -205,108 +131,168 @@
 
       <h3>Total: Rp <span id="totalBayar">0</span></h3>
 
-      <div id="configBox">
-        <small>Printer IP: <span id="ipLabel">-</span></small>
-        <button onclick="aturPrinter()">⚙️ Atur Printer</button>
-      </div>
-
+      <small>Printer IP: <span id="ipLabel">-</span></small
+      ><br />
+      <button onclick="aturPrinter()">⚙️ Atur Printer</button>
       <button class="print-btn" onclick="printStruk()">🖨 Cetak Struk</button>
-      <div id="status" class="status"></div>
 
-      <a href="home.html" class="back-btn">⬅️ Kembali ke Home</a>
+      <div id="status" class="status"></div>
     </div>
 
-    <footer>© 2025 SDS Snack | Sistem Kasir PWA</footer>
+    <footer>© 2025 SDS Snack | Struk 58mm</footer>
 
+    <script src="epos-print.js"></script>
     <script>
       let items = [];
       let total = 0;
-      let printerIP = localStorage.getItem("printerIP") || "-";
+      let printerIP = localStorage.getItem("printerIP") || "192.168.1.150";
       document.getElementById("ipLabel").textContent = printerIP;
 
       function tambahItem() {
-        const nama = document.getElementById("itemName").value.trim();
-        const harga = parseInt(document.getElementById("itemPrice").value);
-        const qty = parseInt(document.getElementById("itemQty").value);
-        if (!nama || !harga || !qty || harga <= 0 || qty <= 0) {
-          alert("⚠️ Lengkapi data item dengan benar!");
-          return;
-        }
-        const jumlah = harga * qty;
-        items.push({ nama, harga, qty, jumlah });
-        updateTabel();
-        resetInput();
-      }
-
-      function hapusItem(index) {
-        items.splice(index, 1);
+        const nama = itemName.value.trim();
+        const harga = parseInt(itemPrice.value);
+        const qty = parseInt(itemQty.value);
+        if (!nama || !harga || !qty) return alert("Lengkapi data item!");
+        items.push({ nama, harga, qty, jumlah: harga * qty });
         updateTabel();
       }
-
+      function hapusItem(i) {
+        items.splice(i, 1);
+        updateTabel();
+      }
       function updateTabel() {
         const tbody = document.querySelector("#itemTable tbody");
         tbody.innerHTML = "";
         total = 0;
-        items.forEach((item, i) => {
-          total += item.jumlah;
-          tbody.innerHTML += `
-            <tr>
-              <td>${item.nama}</td>
-              <td>${item.harga.toLocaleString()}</td>
-              <td>${item.qty}</td>
-              <td>${item.jumlah.toLocaleString()}</td>
-              <td><button class="hapus-btn" onclick="hapusItem(${i})">Hapus</button></td>
-            </tr>
-          `;
+        items.forEach((x, i) => {
+          total += x.jumlah;
+          tbody.innerHTML += `<tr>
+                  <td>${x.nama}</td><td>${x.qty}</td>
+                  <td>${x.harga.toLocaleString()}</td>
+                  <td>${x.jumlah.toLocaleString()}</td>
+                  <td><button class="hapus-btn" onclick="hapusItem(${i})">X</button></td>
+                </tr>`;
         });
-        document.getElementById("totalBayar").textContent =
-          total.toLocaleString();
+        totalBayar.textContent = total.toLocaleString();
       }
-
-      function resetInput() {
-        document.getElementById("itemName").value = "";
-        document.getElementById("itemPrice").value = "";
-        document.getElementById("itemQty").value = 1;
-      }
-
       function aturPrinter() {
         const ip = prompt("Masukkan IP Printer Epson:", printerIP);
         if (ip) {
           printerIP = ip;
           localStorage.setItem("printerIP", ip);
-          document.getElementById("ipLabel").textContent = ip;
+          ipLabel.textContent = ip;
         }
       }
 
-      function printStruk() {
-        if (items.length === 0) {
-          alert("Belum ada item di daftar!");
-          return;
-        }
+      // === Cetak Struk Mini 58mm ===
 
-        const namaKasir = localStorage.getItem("nama") || "Kasir";
-        const data = {
-          items,
-          total,
-          tanggal: new Date().toLocaleString("id-ID"),
-          namaKasir,
-        };
+      // === FUNGSI PEMBANTU UNTUK FORMAT STRUK 58MM ===
+      function formatLine(nama, qty, harga, jumlah, width = 32) {
+        const nm = nama.length > 16 ? nama.slice(0, 16) + "…" : nama;
+        const kanan = `${qty}x${harga.toLocaleString("id-ID")}`;
+        const jumlahText = jumlah.toLocaleString("id-ID");
 
-        const printerIP = localStorage.getItem("printerIP") || "192.168.1.150";
-        document.getElementById("status").textContent = "🔄 Mencetak struk...";
-        printStrukEpsonLAN(printerIP, data);
+        let space = width - nm.length - jumlahText.length;
+        if (space < 1) space = 1;
+
+        return `${nm}${" ".repeat(space)}${jumlahText}\n`;
       }
-    </script>
 
-    <script>
-      // ✅ Registrasi Service Worker PWA
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("./service-worker.js")
-          .then((reg) =>
-            console.log("✅ SW aktif di halaman kasir:", reg.scope)
-          )
-          .catch((err) => console.error("❌ SW error:", err));
+      // === CETAK STRUK DENGAN FONT TOTAL BESAR ===
+      async function printStruk() {
+        if (items.length === 0) return alert("Belum ada item!");
+
+        const tanggal = new Date().toLocaleString("id-ID");
+        const kasir = localStorage.getItem("nama") || "Kasir SDS Snack";
+
+        const epos = new epson.ePOSDevice();
+        epos.connect(printerIP, 8008, async (res) => {
+          if (res === "OK") {
+            epos.createDevice(
+              "local_printer",
+              epos.DEVICE_TYPE_PRINTER,
+              {},
+              async (printer) => {
+                const b = new epson.ePOSBuilder();
+
+                // Tambahkan fallback fungsi style & size
+                if (!b.addTextSize) {
+                  b.addTextSize = function (x, y) {
+                    this.content += `\x1D!${String.fromCharCode(
+                      (x - 1) * 16 + (y - 1)
+                    )}`;
+                    return this;
+                  };
+                }
+                if (!b.addTextStyle) {
+                  b.addTextStyle = function (style) {
+                    if (style === "B") this.content += "\x1B\x45\x01";
+                    else this.content += "\x1B\x45\x00";
+                    return this;
+                  };
+                }
+
+                // HEADER
+                b.addTextAlign(b.Align_CENTER)
+                  .addText("SDS SNACK\n")
+                  .addText("Snack Box & Aneka Roti\n")
+                  .addText("Jl. Raya Dieng Km17, Kejajar\n")
+                  .addText("Wonosobo 56354\n")
+                  .addText("Telp/WA: 082328066205\n")
+                  .addText("--------------------------------\n");
+
+                // INFO TRANSAKSI
+                b.addTextAlign(b.Align_LEFT)
+                  .addText(`Tgl   : ${tanggal}\n`)
+                  .addText(`Kasir : ${kasir}\n`)
+                  .addText("--------------------------------\n");
+
+                // DAFTAR ITEM
+                items.forEach((it) => {
+                  const line = formatLine(it.nama, it.qty, it.harga, it.jumlah);
+                  b.addText(line);
+                });
+
+                // TOTAL
+                b.addText("--------------------------------\n")
+                  .addTextAlign(b.Align_RIGHT)
+                  .addTextStyle("B")
+                  .addTextSize(2, 2)
+                  .addText(`TOTAL : Rp ${total.toLocaleString("id-ID")}\n`)
+                  .addTextSize(1, 1)
+                  .addTextStyle("normal");
+
+                // FOOTER
+                b.addTextAlign(b.Align_CENTER)
+                  .addText("--------------------------------\n")
+                  .addText("Terima Kasih 🙏\n")
+                  .addText("Selamat Menikmati\n")
+                  .addText("Follow IG: @sdssnack.official\n")
+                  .addText("\n\n\n\n\n")
+                  .addCut(b.Cut_FULL);
+
+                const data = b.toString();
+
+                try {
+                  console.log("[PRINT] Sending to bridge...");
+                  await fetch("http://192.168.1.100:3000/print", {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain" },
+                    body: data,
+                  });
+                  status.textContent = "✅ Struk 58mm berhasil dicetak!";
+                } catch (e) {
+                  console.error("[PRINT ERROR]", e);
+                  status.textContent = "❌ Gagal kirim ke printer!";
+                }
+
+                epos.disconnect();
+              }
+            );
+          } else {
+            status.textContent = "❌ Gagal konek ke printer!";
+          }
+        });
       }
     </script>
   </body>

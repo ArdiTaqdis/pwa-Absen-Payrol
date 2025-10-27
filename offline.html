@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SDS Snack - Offline</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        height: 100vh;
+        font-family: "Segoe UI", sans-serif;
+        background: #f7f4ff;
+        color: #555;
+      }
+      img {
+        width: 100px;
+        opacity: 0.6;
+      }
+      h2 {
+        color: #8067eb;
+      }
+      button {
+        margin-top: 10px;
+        background: #8067eb;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="logo-192.png" alt="Logo SDS Snack" />
+    <h2>Anda sedang offline</h2>
+    <p>Silakan periksa koneksi internet Anda.</p>
+    <button onclick="window.location.reload()">🔄 Coba Lagi</button>
+  </body>
+</html>

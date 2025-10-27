@@ -1,22 +1,13 @@
 {
-  "name": "Absensi & Gaji SDS Snack",
+  "name": "SDS Snack - Kasir & Absensi",
   "short_name": "SDS Snack",
-  "start_url": "home.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#8067eb",
   "orientation": "portrait",
-  "scope": "./",
   "icons": [
-    {
-      "src": "logo-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "logo-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "logo-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "logo-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

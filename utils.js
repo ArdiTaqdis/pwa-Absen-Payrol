@@ -1,6 +1,6 @@
 /**
  * Fungsi untuk kompres gambar dari input file, preview hasilnya, dan simpan ke localStorage
- * 
+ *
  * @param {File} file - File gambar dari input
  * @param {string} targetPreviewId - ID elemen untuk menampilkan hasil preview (opsional)
  * @param {string} storageKey - Nama key untuk menyimpan hasil di localStorage
@@ -26,15 +26,16 @@ function compressAndSaveImage(file, targetPreviewId, storageKey, callback) {
 
       // Tampilkan preview jika ada
       if (targetPreviewId) {
-        document.getElementById(targetPreviewId).innerHTML =
-          `<img src="${compressedDataUrl}" style="width:100%; border-radius:10px;">`;
+        document.getElementById(
+          targetPreviewId
+        ).innerHTML = `<img src="${compressedDataUrl}" style="width:100%; border-radius:10px;">`;
       }
 
       // Simpan ke localStorage
       localStorage.setItem(storageKey, compressedDataUrl);
 
       // Callback jika ada
-      if (callback && typeof callback === 'function') {
+      if (callback && typeof callback === "function") {
         callback(compressedDataUrl);
       }
     };
@@ -47,7 +48,7 @@ function compressAndSaveImage(file, targetPreviewId, storageKey, callback) {
 
 /**
  * Validasi ukuran file sebelum dikompres
- * 
+ *
  * @param {File} file - File dari input kamera
  * @param {number} maxSizeMB - Maksimal ukuran file dalam MB
  * @returns {boolean} - true jika valid, false jika terlalu besar
@@ -55,9 +56,19 @@ function compressAndSaveImage(file, targetPreviewId, storageKey, callback) {
 function validateSizeBeforeCompress(file, maxSizeMB = 6) {
   const sizeMB = file.size / (1024 * 1024);
   if (sizeMB > maxSizeMB) {
-    alert(`❌ Ukuran foto terlalu besar (${sizeMB.toFixed(2)} MB). Maksimal ${maxSizeMB} MB.`);
+    alert(
+      `❌ Ukuran foto terlalu besar (${sizeMB.toFixed(
+        2
+      )} MB). Maksimal ${maxSizeMB} MB.`
+    );
     return false;
   }
   return true;
 }
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    console.log("[SW] Versi baru aktif, reload halaman...");
+    window.location.reload();
+  });
+}
